@@ -259,8 +259,8 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/data.txt')
-    test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/test_data.txt')
+    _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/new_data.txt')
+    test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/new_test_data.txt')
 
     num_epochs = 200
     batch_size = 128
@@ -286,7 +286,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err))
+        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
         sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
         for ix in xrange(len(win_rate_result1)):
