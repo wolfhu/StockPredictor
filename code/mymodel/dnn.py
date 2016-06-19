@@ -261,7 +261,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/data.txt')
 
-    num_epochs = 150
+    num_epochs = 3
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -277,12 +277,16 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
             train_err += err
             train_batches += 1
 
+        '''
         for batch in iterate_minibatches(X_val, y_val, batch_size):
             inputs, targets = batch
             _, err, acc, _, _= val(inputs, targets)
             val_err += err
             val_acc += acc
             val_batches += 1
+        '''
+        _, val_err, val_acc, _, _ = val(X_val, y_val)
+        val_batches = 1
 
         # Then we print the results for this epoch:
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
