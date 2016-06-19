@@ -25,8 +25,8 @@
       <file leaf-file-name="dnn.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="32" column="38" selection-start-line="32" selection-start-column="38" selection-end-line="32" selection-end-column="38" />
+            <state relative-caret-position="539">
+              <caret line="264" column="20" selection-start-line="264" selection-start-column="20" selection-end-line="264" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -119,8 +119,8 @@
         <option value="$PROJECT_DIR$/config/rnn_c_4predict_trainer_config.conf" />
         <option value="$PROJECT_DIR$/Code/Feat/utils.py" />
         <option value="$PROJECT_DIR$/Code/mymodel/dnn.py" />
-        <option value="$PROJECT_DIR$/code/mymodel/dnn.py" />
         <option value="$PROJECT_DIR$/code/preprocess/run_all.py" />
+        <option value="$PROJECT_DIR$/code/mymodel/dnn.py" />
       </list>
     </option>
   </component>
@@ -927,8 +927,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="32" column="38" selection-start-line="32" selection-start-column="38" selection-end-line="32" selection-end-column="38" />
+        <state relative-caret-position="539">
+          <caret line="264" column="20" selection-start-line="264" selection-start-column="20" selection-end-line="264" selection-end-column="20" />
           <folding />
         </state>
       </provider>

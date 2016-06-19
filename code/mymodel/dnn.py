@@ -262,7 +262,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/data.txt')
     test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/test_data.txt')
 
-    num_epochs = 30
+    num_epochs = 200
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
