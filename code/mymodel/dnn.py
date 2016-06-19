@@ -281,18 +281,17 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
         #predict
         predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
-        sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
-        for ix in xrange(len(win_rate_result1)):
-            sys.stdout.write(
-                'win_rate is {} and the possitive num is {}\n'.format(win_rate_result1[ix], win_rate_result2[ix]))
 
         # Then we print the results for this epoch:
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  validation loss:\t\t{:.6f}\n".format(val_err))
-        sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(
-            val_acc * 100))
+        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err))
+        sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
+        sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
+        for ix in xrange(len(win_rate_result1)):
+            sys.stdout.write(
+                'win_rate is {} and the possitive num is {}\n'.format(win_rate_result1[ix], win_rate_result2[ix]))
         sys.stdout.flush()
 
 

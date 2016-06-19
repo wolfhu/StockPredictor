@@ -22,12 +22,48 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dnn.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dnn.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="264" column="19" selection-start-line="264" selection-start-column="19" selection-end-line="264" selection-end-column="19" />
+            <state relative-caret-position="386">
+              <caret line="293" column="114" selection-start-line="293" selection-start-column="114" selection-end-line="293" selection-end-column="114" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="data_acquire.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-194">
+              <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="run_all.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/code/preprocess/run_all.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="22" column="30" selection-start-line="22" selection-start-column="30" selection-end-line="22" selection-end-column="30" />
+              <folding>
+                <marker date="1466310623200" expanded="true" signature="694:849" ph="SELECT time,... " />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="param_config.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code/param_config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="546">
+              <caret line="55" column="73" selection-start-line="55" selection-start-column="73" selection-end-line="55" selection-end-column="73" />
+              <folding>
+                <marker date="1466251884000" expanded="true" signature="701:814" ph="SELECT time,... " />
+                <marker date="1466251884000" expanded="true" signature="840:933" ph="SELECT time,... " />
+                <marker date="1466251884000" expanded="true" signature="962:1010" ph="SELECT * FRO... price_amount_ratio" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -84,6 +120,7 @@
         <option value="$PROJECT_DIR$/Code/Feat/utils.py" />
         <option value="$PROJECT_DIR$/Code/mymodel/dnn.py" />
         <option value="$PROJECT_DIR$/code/mymodel/dnn.py" />
+        <option value="$PROJECT_DIR$/code/preprocess/run_all.py" />
       </list>
     </option>
   </component>
@@ -171,7 +208,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="mymodel" />
+              <option name="myItemId" value="preprocess" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -769,27 +806,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-11">
-          <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code/preprocess/run_all.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/code/param_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="769">
-          <caret line="55" column="73" selection-start-line="55" selection-start-column="73" selection-end-line="55" selection-end-column="73" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/code/evaluate/run_all.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
@@ -881,9 +897,39 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="264" column="19" selection-start-line="264" selection-start-column="19" selection-end-line="264" selection-end-column="19" />
+        <state relative-caret-position="386">
+          <caret line="293" column="114" selection-start-line="293" selection-start-column="114" selection-end-line="293" selection-end-column="114" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-194">
+          <caret line="114" column="0" selection-start-line="114" selection-start-column="0" selection-end-line="114" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/param_config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="546">
+          <caret line="55" column="73" selection-start-line="55" selection-start-column="73" selection-end-line="55" selection-end-column="73" />
+          <folding>
+            <marker date="1466251884000" expanded="true" signature="701:814" ph="SELECT time,... " />
+            <marker date="1466251884000" expanded="true" signature="840:933" ph="SELECT time,... " />
+            <marker date="1466251884000" expanded="true" signature="962:1010" ph="SELECT * FRO... price_amount_ratio" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/preprocess/run_all.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="22" column="30" selection-start-line="22" selection-start-column="30" selection-end-line="22" selection-end-column="30" />
+          <folding>
+            <marker date="1466310623200" expanded="true" signature="694:849" ph="SELECT time,... " />
+          </folding>
         </state>
       </provider>
     </entry>
