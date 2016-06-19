@@ -260,55 +260,51 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
     _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/data.txt')
+    test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/test_data.txt')
 
-    num_epochs = 3
+    num_epochs = 30
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
-        val_err = 0
-        val_acc = 0
-        val_win_rate = 0
         train_batches = 0
-        val_batches = 0
         start_time = time.time()
+
+        #train
         for batch in iterate_minibatches(X_train, y_train, batch_size):
             inputs, targets = batch
             err= train(inputs, targets)
             train_err += err
             train_batches += 1
 
-        '''
-        for batch in iterate_minibatches(X_val, y_val, batch_size):
-            inputs, targets = batch
-            _, err, acc, _, _= val(inputs, targets)
-            val_err += err
-            val_acc += acc
-            val_batches += 1
-        '''
+        #validate
         _, val_err, val_acc, _, _ = val(X_val, y_val)
-        val_batches = 1
+
+        #predict
+        predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
+        sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
+        for ix in xrange(len(win_rate_result1)):
+            sys.stdout.write(
+                'win_rate is {} and the possitive num is {}\n'.format(win_rate_result1[ix], win_rate_result2[ix]))
 
         # Then we print the results for this epoch:
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  validation loss:\t\t{:.6f}\n".format(val_err / val_batches))
+        sys.stdout.write("  validation loss:\t\t{:.6f}\n".format(val_err))
         sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(
-            val_acc / val_batches * 100))
+            val_acc * 100))
         sys.stdout.flush()
 
-    test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/test_data.txt')
-    print test_data[:3], test_label[:3]
-    predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
-    sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
-    for ix in xrange(len(win_rate_result1)):
-        sys.stdout.write('win_rate is {} and the possitive num is {}\n'.format(win_rate_result1[ix], win_rate_result2[ix]))
+
+
+    '''
     with open('128_predict_result', 'w') as f:
         for ix in xrange(len(test_label)):
             f.write('{} {}\n'.format(test_label[ix], predict_result[ix]))
     sys.stdout.flush()
 
     print 'Done!'
+    '''
 
 if __name__ == '__main__':
     learning_rate_list = [0.001]
