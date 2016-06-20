@@ -260,7 +260,13 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
     _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/new_data.txt')
-    test_data, test_label, _, _, _, _, _, _ = load_dataset('../../data/new_test_data.txt')
+    test_data_list = []
+    test_label_list = []
+    for ix in range(21):
+        file_name = '../../data/test_dis/data_' + str(ix) + '.txt'
+        tmp_test_data, tmp_test_label, _, _, _, _, _, _ = load_dataset(file_name)
+        test_data_list.append(tmp_test_data)
+        test_label_list.append(tmp_test_label)
 
     num_epochs = 200
     batch_size = 128
@@ -280,7 +286,12 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         _, val_err, val_acc, _, _ = val(X_val, y_val)
 
         #predict
-        predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
+        predict_result_list = []
+        for ix in range(len(test_data_list)):
+            test_data = test_data_list[ix]
+            test_label = test_label_list[ix]
+            predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
+            predict_result_list.append((predict_result, loss, acc, win_rate_result1, win_rate_result2))
 
         # Then we print the results for this epoch:
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
@@ -288,10 +299,23 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
         sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
-        sys.stdout.write('loss is {} and acc is {}\n'.format(loss, acc))
-        for ix in xrange(len(win_rate_result1)):
-            sys.stdout.write(
-                'win_rate is {} and the possitive num is {}\n'.format(win_rate_result1[ix], win_rate_result2[ix]))
+
+        for ix in range(len(predict_result_list)):
+            sys.stdout.write('{} data:\n'.format(ix))
+            sys.stdout.write('loss is {} and acc is {}\n'.format(predict_result_list[ix][1], predict_result_list[ix][2]))
+            for iix in xrange(len(win_rate_result1)):
+                sys.stdout.write(
+                    'win_rate is {} and the possitive num is {}\n'.format(predict_result_list[ix][3][iix], predict_result_list[ix][4][iix]))
+        sys.stdout.write('\n')
+
+        if epoch == 0 or epoch == 99 or epoch == 199:
+            file_path = str(epoch+1) + '_predict_result/'
+            for ix in range(len(predict_result_list)):
+                file_name = file_path + 'day' + str(ix)
+                with open(file_name, 'w') as f:
+                    for iix in xrange(len(test_label_list[ix])):
+                        f.write('{} {}\n'.format(test_label_list[ix][iix], predict_result_list[ix][0][iix]))
+
         sys.stdout.flush()
 
 
@@ -306,9 +330,9 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     '''
 
 if __name__ == '__main__':
-    learning_rate_list = [0.001]
-    dnn_strategy_list = ['mix']
-    possitive_punishment_list = [1]
+    learning_rate_list = [0.001, 0,005, 0.0005]
+    dnn_strategy_list = ['mix', 'cascade', 'conv1d']
+    possitive_punishment_list = [1, 2]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:

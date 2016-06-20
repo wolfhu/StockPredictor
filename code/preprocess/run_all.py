@@ -12,12 +12,11 @@ import os
 #######################
 ## load data ##
 #######################
-
+'''
 codes = get_most_corr_code("000001")
 codes.append("000001")
 sql_list = [config.get_sql_by_code(codes)]
 
-'''
 stocks_info = []
 with open(config.code_file, 'r') as f:
     for line in f.readlines():
@@ -30,7 +29,9 @@ for stock_info in stocks_info:
     sql = "SELECT time, code, close FROM price_amount_ratio WHERE code = '" + stock_info[0] + "' and time between '" + stock_info[1] + "' and '" + config.end_time +"'"
     sql_list.append(sql)
 '''
-train_data, test_data_list = query(sql_list)
+train_data, test_data_list = query([config.sql])
+
+assert len(train_data) != 0
 
 #######################
 ## filter noise ##
