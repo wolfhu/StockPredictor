@@ -40,14 +40,16 @@ def load_dataset(file_path):
     X = np.array(X).astype(np.float32)
     y = np.array(y).astype(np.int32)
     values = np.array(values).astype(np.float32)
-    train_size = int(0.9 * len(y))
-    X_train, X_val  = X[:train_size], X[train_size:]
-    y_train, y_val = y[:train_size], y[train_size:]
+    train_size = int(0.7 * len(y))
+    val_size = int(0.85 * len(y))
+    X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
+    y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
+
     values_train, values_val = values[:train_size], values[train_size:]
 
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
-    return X, y, X_train, y_train, X_val, y_val, values_train, values_val
+    return X, y, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
 def build_convpool_conv1d(input_var, nb_classes, input_size=20, n_chanels=1, activity=softmax):
     """
@@ -204,7 +206,6 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=True):
 # ############################# Self define loss ###############################
 def self_binary_crossentropy(output, target, possitive_punishment=1):
     """
-    更大的正例惩罚力度
     Compute the crossentropy of binary random variables.
     Output and target are each expectations of binary random
     variables; target may be exactly 0 or 1 but output must
@@ -216,8 +217,8 @@ def self_binary_crossentropy(output, target, possitive_punishment=1):
     We do not sum, crossentropy is computed by component.
     TODO : Rewrite as a scalar, and then broadcast to tensor.
     """
-    return -(possitive_punishment * target * T.log(output) + (1.0 - target) * T.log(1.0 - output))
-
+    #return -(possitive_punishment * target * T.log(output) + (1.0 - target) * T.log(1.0 - output))
+    return -(possitive_punishment * target * T.log(output))
 
 def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
@@ -259,16 +260,18 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/new_data.txt')
+    _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/data.txt')
+    '''
     test_data_list = []
     test_label_list = []
-    for ix in range(21):
+    for ix in range(103):
         file_name = '../../data/test_dis/data_' + str(ix) + '.txt'
         tmp_test_data, tmp_test_label, _, _, _, _, _, _ = load_dataset(file_name)
         test_data_list.append(tmp_test_data)
         test_label_list.append(tmp_test_label)
+    '''
 
-    num_epochs = 200
+    num_epochs = 150
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -284,7 +287,9 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
         #validate
         _, val_err, val_acc, _, _ = val(X_val, y_val)
+        _, test_err, test_acc, _, _ = val(X_test, y_test)
 
+        '''
         #predict
         predict_result_list = []
         for ix in range(len(test_data_list)):
@@ -293,12 +298,6 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
             predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
             predict_result_list.append((predict_result, loss, acc, win_rate_result1, win_rate_result2))
 
-        # Then we print the results for this epoch:
-        sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
-            epoch + 1, num_epochs, time.time() - start_time))
-        sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
-        sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
 
         for ix in range(len(predict_result_list)):
             sys.stdout.write('{} data:\n'.format(ix))
@@ -306,8 +305,18 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
             for iix in xrange(len(win_rate_result1)):
                 sys.stdout.write(
                     'win_rate is {} and the possitive num is {}\n'.format(predict_result_list[ix][3][iix], predict_result_list[ix][4][iix]))
+        '''
+        # Then we print the results for this epoch:
+        sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
+            epoch + 1, num_epochs, time.time() - start_time))
+        sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
+        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
+        sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
+        sys.stdout.write("  test loss:\t\t{}\n".format(test_err / 1))
+        sys.stdout.write("  test accuracy:\t\t{:.2f} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
 
+        '''
         if epoch == 0 or epoch == 99 or epoch == 199:
             file_path = str(epoch+1) + '_predict_result/'
             for ix in range(len(predict_result_list)):
@@ -316,6 +325,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
                     for iix in xrange(len(test_label_list[ix])):
                         f.write('{} {}\n'.format(test_label_list[ix][iix], predict_result_list[ix][0][iix]))
 
+        '''
         sys.stdout.flush()
 
 
@@ -330,9 +340,9 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     '''
 
 if __name__ == '__main__':
-    learning_rate_list = [0.001, 0,005, 0.0005]
+    learning_rate_list = [0.001]
     dnn_strategy_list = ['mix', 'cascade', 'conv1d']
-    possitive_punishment_list = [1, 2]
+    possitive_punishment_list = [1]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:
