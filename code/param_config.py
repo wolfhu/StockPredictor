@@ -16,15 +16,15 @@ class ParamConfig:
         self.before = 20
         self.after = 5
         self.interval = 1
-        self.left4test = 20 #每只股票的最后n个留下来作为测试机，做成n个横截面
-        self.threhold_up_down = 0.0
+        self.left4test = 20  #每只股票的最后n个留下来作为测试机，做成n个横截面
+        self.threhold_up_down = 0.02
         self.fluctuation_threhold = 0.0
         self.thread_size = 10
         self.is_dis = True
         # cols_dimension = ['open', 'high', 'low', 'close', 'amount']
         self.cols_dimension = ['close']
         self.start_time = '20070101'
-        self.end_time = '20141001'
+        self.end_time = '20151231'
         self.sql = "SELECT time, code, close FROM price_amount_ratio WHERE name like '%银行' and time between '20070101' and '20150202'"
         self.all_sql = "SELECT time, code, close FROM price_amount_ratio WHERE time between '20070101' and '20150202'"
         self.sql_prefix = "SELECT * FROM price_amount_ratio WHERE code in ("
@@ -50,11 +50,11 @@ class ParamConfig:
         self.same_stock_num = 30
 
         #file related
-        self.all_file_path = '/home/deepDataBase/bank/dis/data/'
-        self.code_file_path = '/home/deepDataBase/bank/dis/'
-        self.test_file_path = '/home/deepDataBase/bank/test_dis/'
-        self.predict_result_path = '/home/deepDataBase/bank/test_dis_result/'
-        self.shuffle_file_path = '/home/deepDataBase/bank/dis_shuffle/'
+        self.all_file_path = '/home/deepDataBase/800/dis/data/'
+        self.code_file_path = '/home/deepDataBase/800/dis/'
+        self.test_file_path = '/home/deepDataBase/800/test_dis/'
+        self.predict_result_path = '/home/deepDataBase/800/test_dis_result/'
+        self.shuffle_file_path = '/home/deepDataBase/800/dis_shuffle/'
         #self.original_file = '/home/deepDataBase/000001same'
         self.corr_file = '/home/xutao/generateData/corr_2007'
         self.file_prefix = "data_"
