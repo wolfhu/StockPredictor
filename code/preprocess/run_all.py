@@ -12,13 +12,9 @@ import os
 #######################
 ## load data ##
 #######################
-'''
-codes = get_most_corr_code("000001")
-codes.append("000001")
-sql_list = [config.get_sql_by_code(codes)]
-'''
 
 stocks_info = []
+codes800 = set()
 with open(config.code_file, 'r') as f:
     for line in f.readlines()[-800:]:
         phrases = line.split(',')
@@ -36,10 +32,15 @@ with open(config.code_file, 'r') as f:
             start_date += date_str[2]
         stocks_info.append((code, start_date))
 
+'''
 sql_list = []
 for stock_info in stocks_info:
     sql = "SELECT time, code, close FROM price_amount_ratio WHERE code = '" + stock_info[0] + "' and time > '" + stock_info[1] +"'"
     sql_list.append(sql)
+'''
+codes = get_most_corr_code("000001")
+codes.append("000001")
+sql_list = [config.get_sql_by_code(codes)]
 
 train_data, test_data_list = query(sql_list)
 

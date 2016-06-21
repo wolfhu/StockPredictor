@@ -29,7 +29,7 @@ def load_dataset(file_path):
             phrases = line.split()
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
-            X.append([features])
+            X.append([features[:20], features[20:40], features[40:60], features[60:80]])
             value = float(phrases[-1])
             values.append(value)
             if value <= 0:
@@ -44,6 +44,7 @@ def load_dataset(file_path):
     val_size = int(0.85 * len(y))
     X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
     y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
+    print len(X_train), len(X_val), len(X_test)
 
     values_train, values_val = values[:train_size], values[train_size:]
 
@@ -51,7 +52,7 @@ def load_dataset(file_path):
     # (It doesn't matter how we do this as long as we can read them again.)
     return X, y, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
-def build_convpool_conv1d(input_var, nb_classes, input_size=20, n_chanels=1, activity=softmax):
+def build_convpool_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -84,7 +85,7 @@ def build_convpool_conv1d(input_var, nb_classes, input_size=20, n_chanels=1, act
 
     return network
 
-def build_convpool_dnn(input_var, nb_classes, input_size=20, n_chanels=1, activity=softmax):
+def build_convpool_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -106,7 +107,7 @@ def build_convpool_dnn(input_var, nb_classes, input_size=20, n_chanels=1, activi
 
     return network
 
-def build_convpool_mix(input_var, nb_classes, input_size=20, n_chanels=1, activity=softmax):
+def build_convpool_mix(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -147,7 +148,7 @@ def build_convpool_mix(input_var, nb_classes, input_size=20, n_chanels=1, activi
 
     return network
 
-def build_convpool_cascade(input_var, nb_classes, input_size=20, n_chanels=1, activity=softmax):
+def build_convpool_cascade(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -217,20 +218,20 @@ def self_binary_crossentropy(output, target, possitive_punishment=1):
     We do not sum, crossentropy is computed by component.
     TODO : Rewrite as a scalar, and then broadcast to tensor.
     """
-    #return -(possitive_punishment * target * T.log(output) + (1.0 - target) * T.log(1.0 - output))
-    return -(possitive_punishment * target * T.log(output))
+    return -(possitive_punishment * target * T.log(output) + (1.0 - target) * T.log(1.0 - output))
+    #return -(possitive_punishment * target * T.log(output))
 
 def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
     input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
-    network = build_convpool_mix(input_var, 1, activity=sigmoid)
+    network = build_convpool_mix(input_var, 1, 4, 20, activity=sigmoid)
     if dnn_strategy == 'dnn':
-        build_convpool_dnn(input_var, 1, activity=sigmoid)
+        build_convpool_dnn(input_var, 1, 4, 20, activity=sigmoid)
     elif dnn_strategy == 'conv1d':
-        build_convpool_conv1d(input_var, 1, activity=sigmoid)
+        build_convpool_conv1d(input_var, 1, 4, 20, activity=sigmoid)
     elif dnn_strategy == 'cascade':
-        build_convpool_cascade(input_var, 1, activity=sigmoid)
+        build_convpool_cascade(input_var, 1, 4, 20, activity=sigmoid)
     elif dnn_strategy == 'mix':
         pass
     else:
@@ -242,7 +243,6 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     all_params = get_all_params(network, trainable=True)
     updates = adagrad(loss, all_params, learning_rate=learning_rate)
     train = theano.function([input_var, target_var], loss, updates=updates)
-
     test_prediction = get_output(network, deterministic=True)
     test_loss = self_binary_crossentropy(test_prediction, target_var, possitive_punishment=possitive_punishment).mean()
     #test_acc = T.mean(T.eq(T.argmax(test_prediction, axis=1), target_var), dtype=theano.config.floatX)
