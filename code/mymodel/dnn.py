@@ -317,16 +317,19 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         _, test_err, test_acc, test_wr1, test_wr2 = val(X_test, y_test)
 
         # Then we print the results for this epoch:
-        for ix in len([0.5, 0.6, 0.7, 0.8, 0.9]:
-            sys.stdout.write("  validation loss:\t\t{.6f}\n".format(val_err / 1))
+        for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
+            sys.stdout.write("  validation win rate loss:\t\t{}\n".format(val_wr1[ix]))
+            sys.stdout.write("  validation possitive num:\t\t{}\n".format(val_wr2[ix]))
+            sys.stdout.write("  test win rate loss:\t\t{}\n".format(test_wr1[ix]))
+            sys.stdout.write("  test possitive num:\t\t{}\n".format(test_wr2[ix]))
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
-        sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_acc / train_batches))
-        sys.stdout.write("  validation loss:\t\t{.6f}\n".format(val_err/1))
-        sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
-        sys.stdout.write("  test loss:\t\t{.6f}\n".format(test_err / 1))
-        sys.stdout.write("  test accuracy:\t\t{:.2f} %\n".format(test_acc * 100))
+        sys.stdout.write("  training loss:\t\t{}\n".format(train_err / train_batches))
+        sys.stdout.write("  training loss:\t\t{}\n".format(train_acc / train_batches))
+        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
+        sys.stdout.write("  validation accuracy:\t\t{} %\n".format(val_acc * 100))
+        sys.stdout.write("  test loss:\t\t{}\n".format(test_err / 1))
+        sys.stdout.write("  test accuracy:\t\t{} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
         sys.stdout.flush()
 
