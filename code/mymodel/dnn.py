@@ -41,7 +41,7 @@ def load_dataset(file_path):
     y = np.array(y).astype(np.int32)
     values = np.array(values).astype(np.float32)
     train_size = int(0.7 * len(y))
-    val_size = int(0.85 * len(y))
+    val_size = int(0.15 * len(y))
     X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
     y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
     print len(X_train), len(X_val), len(X_test)
@@ -239,13 +239,13 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     l_output = get_output(network)
     loss = self_binary_crossentropy(l_output, target_var, possitive_punishment=possitive_punishment).mean()
-
+    train_acc = binary_accuracy(l_output, target_var).mean()
     all_params = get_all_params(network, trainable=True)
     updates = adagrad(loss, all_params, learning_rate=learning_rate)
-    train = theano.function([input_var, target_var], loss, updates=updates)
+    train = theano.function([input_var, target_var], [loss, train_acc], updates=updates)
+
     test_prediction = get_output(network, deterministic=True)
     test_loss = self_binary_crossentropy(test_prediction, target_var, possitive_punishment=possitive_punishment).mean()
-    #test_acc = T.mean(T.eq(T.argmax(test_prediction, axis=1), target_var), dtype=theano.config.floatX)
     test_acc = binary_accuracy(test_prediction, target_var).mean()
 
     #calculate win rate
@@ -275,72 +275,38 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
+        train_acc = 0
         train_batches = 0
         start_time = time.time()
 
         #train
         for batch in iterate_minibatches(X_train, y_train, batch_size):
             inputs, targets = batch
-            err= train(inputs, targets)
+            err, acc= train(inputs, targets)
             train_err += err
+            train_acc += acc
             train_batches += 1
 
         #validate
         _, val_err, val_acc, _, _ = val(X_val, y_val)
         _, test_err, test_acc, _, _ = val(X_test, y_test)
 
-        '''
-        #predict
-        predict_result_list = []
-        for ix in range(len(test_data_list)):
-            test_data = test_data_list[ix]
-            test_label = test_label_list[ix]
-            predict_result, loss, acc, win_rate_result1, win_rate_result2 = val(test_data, test_label)
-            predict_result_list.append((predict_result, loss, acc, win_rate_result1, win_rate_result2))
-
-
-        for ix in range(len(predict_result_list)):
-            sys.stdout.write('{} data:\n'.format(ix))
-            sys.stdout.write('loss is {} and acc is {}\n'.format(predict_result_list[ix][1], predict_result_list[ix][2]))
-            for iix in xrange(len(win_rate_result1)):
-                sys.stdout.write(
-                    'win_rate is {} and the possitive num is {}\n'.format(predict_result_list[ix][3][iix], predict_result_list[ix][4][iix]))
-        '''
         # Then we print the results for this epoch:
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
-        sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
+        sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_acc / train_batches))
+        sys.stdout.write("  validation loss:\t\t{.6f}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{:.2f} %\n".format(val_acc * 100))
-        sys.stdout.write("  test loss:\t\t{}\n".format(test_err / 1))
+        sys.stdout.write("  test loss:\t\t{.6f}\n".format(test_err / 1))
         sys.stdout.write("  test accuracy:\t\t{:.2f} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
-
-        '''
-        if epoch == 0 or epoch == 99 or epoch == 199:
-            file_path = str(epoch+1) + '_predict_result/'
-            for ix in range(len(predict_result_list)):
-                file_name = file_path + 'day' + str(ix)
-                with open(file_name, 'w') as f:
-                    for iix in xrange(len(test_label_list[ix])):
-                        f.write('{} {}\n'.format(test_label_list[ix][iix], predict_result_list[ix][0][iix]))
-
-        '''
         sys.stdout.flush()
 
-
-
-    '''
-    with open('128_predict_result', 'w') as f:
-        for ix in xrange(len(test_label)):
-            f.write('{} {}\n'.format(test_label[ix], predict_result[ix]))
-    sys.stdout.flush()
-
     print 'Done!'
-    '''
 
 if __name__ == '__main__':
-    learning_rate_list = [0.001]
+    learning_rate_list = [0.005]
     dnn_strategy_list = ['mix', 'cascade', 'conv1d']
     possitive_punishment_list = [1]
 

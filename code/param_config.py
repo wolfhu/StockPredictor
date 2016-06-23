@@ -25,11 +25,11 @@ class ParamConfig:
         self.cols_dimension = ['close']
         self.start_time = '20070101'
         self.end_time = '20151231'
-        self.sql = "SELECT time, code, close FROM price_amount_ratio WHERE name like '%银行' and time between '20070101' and '20150202'"
-        self.all_sql = "SELECT time, code, close FROM price_amount_ratio WHERE time between '20070101' and '20150202'"
+        self.sql = "SELECT * FROM price_amount_ratio WHERE name like '%银行' and time between '20070101' and '20150202'"
+        self.all_sql = "SELECT * FROM price_amount_ratio WHERE time between '20070101' and '20150202'"
         self.sql_prefix = "SELECT * FROM price_amount_ratio WHERE code in ("
         self.sql_postfix = ") and time between '" + self.start_time + "' and '" + self.end_time + "'"
-        self.code_file = "../../data/stocks.csv"
+        self.code_file = "../../data/CodeMap.xls"
         self.ip = "10.100.47.147"
         self.user = "root"
         self.passwd = "rootsafe"

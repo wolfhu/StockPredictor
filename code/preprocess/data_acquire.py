@@ -47,7 +47,7 @@ class StockConsumer(threading.Thread):
                 break
 
             #有的没有数据，过滤掉
-            if len(single_stock_data) < config.before + config.after + config.interval + config.left4test:
+            if len(single_stock_data) < (config.before + config.after + config.interval) * config.left4test:
                 continue
 
             features_and_result_train = []
@@ -80,7 +80,7 @@ class StockConsumer(threading.Thread):
 
                 feature_df = single_stock_data.ix[ix:ix + config.before - 1, config.cols_dimension]
                 features = reduce(lambda x, y: x + y, feature_df.values.tolist())
-                features.extend([single_stock_data.loc[0, 'code'], after_price])
+                features.extend([single_stock_data.loc[ix, 'time'], single_stock_data.loc[0, 'code'], after_price])
 
                 if after_price <= -config.threhold_up_down:
                     features.append(0)
@@ -112,7 +112,6 @@ def query(sql_list):
     '''
 
     stocks_data = sql_query(sql_list)
-    print 'data return from sql_query is {}'.format(len(stocks_data))
 
     #将每只股票划分开加入queue
     stocks_data_queue = Queue()
@@ -138,12 +137,12 @@ def query(sql_list):
     for ix in xrange(config.before):
         for col in config.cols_dimension:
             feature_cols.append(col + str(ix))
-    feature_cols.extend(['code', 'value', 'label'])
+    feature_cols.extend(['time', 'code', 'value', 'label'])
     train_data = pd.DataFrame(train_result, columns=feature_cols)
 
     #标准化test_result
-    test_original_data = [[x[i] for x in test_result if len(x) == config.left4test] for i in xrange(config.left4test)]
 
+    test_original_data = [[x[i] for x in test_result] for i in xrange(config.left4test)]
     test_data_list = []
     for test_original_datum in test_original_data:
         test_data_list.append(pd.DataFrame(test_original_datum, columns=feature_cols))

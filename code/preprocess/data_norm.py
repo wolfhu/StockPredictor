@@ -10,7 +10,7 @@ from param_config import config
 
 # z-score: y = (x-mean)/std
 def _z_score(df_data):
-    df = df_data.drop(['code', 'value', 'label'], axis=1)
+    df = df_data.drop(['time', 'code', 'value', 'label'], axis=1)
     cols = list(df.columns)
     df_data['mean'] = df.apply(np.mean, axis=1)
     df_data['std'] = df.apply(np.std, axis=1)
@@ -27,7 +27,7 @@ def _z_score(df_data):
 
 #min-max: y = (x-min)/(max-min)
 def _min_max(df_data):
-    df = df_data.drop(['code', 'value', 'label'], axis=1)
+    df = df_data.drop(['time', 'code', 'value', 'label'], axis=1)
     cols = list(df.columns)
     df_data['min'] = df.apply(min, axis=1)
     df_data['max'] = df.apply(max, axis=1)
@@ -44,7 +44,7 @@ def _min_max(df_data):
 
 #decimal-scaling: y = x/10^j, where j is the smallest integer such that max(|y|)<1
 def _decimal_scaling(df_data):
-    df = df_data.drop(['code', 'value', 'label'], axis=1)
+    df = df_data.drop(['time', 'code', 'value', 'label'], axis=1)
     cols = list(df.columns)
     df_data['j'] = df.apply(lambda x: -(int)(np.log10(1 / max(x))), axis=1)
 
