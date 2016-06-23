@@ -8,7 +8,7 @@ def _filter_apply(row, up_threhold, down_threhold):
     row_cols = row.columns
     for ix in xrange(1, len(row_cols)):
         ratio = row[row_cols[ix]] / row[row_cols[ix - 1]]
-        if  ratio > up_threhold and ratio < down_threhold:
+        if  ratio >= up_threhold and ratio <= down_threhold:
             return False
     return True
 
@@ -26,7 +26,7 @@ def _filter_large_up_down(df_data, cols, up_threhold, down_threhold):
 过滤包含急升急跌的时间点的数据
 因为觉得这很有可能是因为外部刺激引起的，暂时不考虑这些外部刺激，
 而且这些状况的样本数量比较少，即使想抓取也比较难（后期可以采用adaboost或加权重的方式）
-但目前采取的最基本的过滤策略是将特征中隔天收盘价涨跌9%以上的数据去掉
+但目前采取的最基本的过滤策略是将特征中隔天收盘价涨跌10%的数据去掉
 '''
 def _filter_close_large_up_down(df_data):
     cols = [x for x in df_data.columns if 'close' in x]

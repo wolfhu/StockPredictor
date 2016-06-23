@@ -13,11 +13,16 @@ from param_config import config
 
 
 # 打开数据库连接，执行sql进行数据库读取
-def sql_query(sql):
+def sql_query(sql_list):
+    stocks_list = []
     db = MySQLdb.connect(config.ip, config.user, config.passwd, config.database, config.port)
-    stocks_data = pd.read_sql_query(sql, con=db)
+    for sql in sql_list:
+        stock_data = pd.read_sql_query(sql, con=db)
+        stock_data = stock_data.dropna()
+        stocks_list.append(stock_data)
     db.close()
 
+    stocks_data = pd.concat(stocks_list)
     return stocks_data
 
 class StockConsumer(threading.Thread):
@@ -41,37 +46,20 @@ class StockConsumer(threading.Thread):
             else:
                 self.lock.release()
                 break
+
+            #有的没有数据，过滤掉
+            assert len(single_stock_data) > config.before + config.after + config.interval * config.left4test
+
             features_and_result_train = []
             features_and_result_test = []
 
-            if not config.is_dis:
-                single_stock_data.loc[0, config.cols_dimension] = 1.0
-                # 初始化
-                for ix in xrange(1, config.before + config.after - config.interval - 1):
-                    single_stock_data.loc[ix, config.cols_dimension] = single_stock_data.loc[ix - 1, config.cols_dimension] * \
-                                                                 single_stock_data.loc[ix, config.cols_dimension]
-
             # 循环添加
             for ix in xrange(0, len(single_stock_data) - config.before - config.after, config.interval):
-                if config.is_dis:
-                    after_price = reduce(lambda x, y: x * y,
-                                         single_stock_data.loc[ix + config.before:ix + config.before + config.after - 1, 'close']) - 1
-                else:
-                    # 向后移动一个，新加入
-                    for iix in xrange(ix - config.interval + config.before + config.after, ix + config.before + config.after):
-                        single_stock_data.loc[iix, config.cols_dimension] = single_stock_data.loc[iix, config.cols_dimension] * \
-                                single_stock_data.loc[iix - 1, config.cols_dimension]
-
-                    # 将新的before+after个除以第二十天的
-                    single_stock_data.loc[ix:ix + config.before + config.after - 1, config.cols_dimension] /= single_stock_data.loc[
-                        ix, config.cols_dimension]
-
-                    after_price = single_stock_data.loc[ix + config.before + config.after - 1, 'close'] / single_stock_data.loc[
-                        ix + config.before - 1, 'close'] - 1
+                after_price = single_stock_data.ix[ix+config.before+config.after-1, 'close'] / single_stock_data.ix[ix+config.before-1, 'close'] - 1
 
                 feature_df = single_stock_data.ix[ix:ix + config.before - 1, config.cols_dimension]
                 features = reduce(lambda x, y: x + y, feature_df.values.tolist())
-                features.extend([single_stock_data.loc[0, 'code'], after_price])
+                features.extend([single_stock_data.loc[ix, 'date'], single_stock_data.loc[0, 'symbol'], after_price])
 
                 if after_price <= -config.threhold_up_down:
                     features.append(0)
@@ -85,8 +73,9 @@ class StockConsumer(threading.Thread):
 
             features_and_result_test = features_and_result_train[-config.left4test:]
             features_and_result_train = features_and_result_train[:-config.left4test]
+            print single_stock_data.loc[0, 'symbol'], len(single_stock_data), len(features_and_result_train), len(features_and_result_test)
             self.train_result.extend(features_and_result_train)
-            self.test_result.extend(features_and_result_test)
+            self.test_result.append(features_and_result_test)
             print "A stock has finished and {} stocks left".format(self.queue.qsize())
 
         self.lock.acquire()
@@ -94,19 +83,19 @@ class StockConsumer(threading.Thread):
         self.parent_test_result.extend(self.test_result)
         self.lock.release()
 
-def query(sql):
+def query(sql_list):
     '''
     if os.path.isfile(config.all_file_path) :
         train_data = pd.read_csv(config.all_file_path)
         return train_data
     '''
 
-    stocks_data = sql_query(sql)
+    stocks_data = sql_query(sql_list)
 
     #将每只股票划分开加入queue
     stocks_data_queue = Queue()
-    for tmp, single_stock_data in stocks_data.groupby('name'):
-        single_stock_data = single_stock_data.sort(['time'])
+    for tmp, single_stock_data in stocks_data.groupby('symbol'):
+        single_stock_data = single_stock_data.sort(['date'])
         single_stock_data.index = range(len(single_stock_data))
         stocks_data_queue.put(single_stock_data)
 
@@ -126,15 +115,16 @@ def query(sql):
     feature_cols = []
     for ix in xrange(config.before):
         for col in config.cols_dimension:
-            feature_cols.append(col + str(ix))
-    feature_cols.extend(['code', 'value', 'label'])
+            feature_cols.append(col + '_' + str(ix))
+    feature_cols.extend(['date', 'symbol', 'value', 'label'])
     train_data = pd.DataFrame(train_result, columns=feature_cols)
 
     #标准化test_result
+
     test_original_data = [[x[i] for x in test_result] for i in xrange(config.left4test)]
     test_data_list = []
     for test_original_datum in test_original_data:
-        test_data_list.append(pd.DataFRame(test_original_datum, columns=feature_cols))
+        test_data_list.append(pd.DataFrame(test_original_datum, columns=feature_cols))
 
     #train_data.to_csv(config.original_file, index=False)
     return train_data, test_data_list

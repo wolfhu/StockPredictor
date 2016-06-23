@@ -47,7 +47,7 @@ class StockConsumer(threading.Thread):
                 break
 
             #有的没有数据，过滤掉
-            if len(single_stock_data) < (config.before + config.after + config.interval) * config.left4test:
+            if len(single_stock_data) < config.before + config.after + config.interval * config.left4test:
                 continue
 
             features_and_result_train = []

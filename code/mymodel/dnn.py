@@ -52,7 +52,7 @@ def load_dataset(file_path):
     # (It doesn't matter how we do this as long as we can read them again.)
     return X, y, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
-def build_convpool_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -85,7 +85,28 @@ def build_convpool_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, act
 
     return network
 
-def build_convpool_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+    """
+    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+
+    :param input_vars: list of EEG images (one image per time window)
+    :param nb_classes: number of classes
+    :return: a pointer to the output of last layer
+    """
+    # Input layer
+    network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+
+    network = ReshapeLayer(network, ((None, 16, 20)))
+
+    network = LSTMLayer(network, num_units=8, nonlinearity=tanh)
+
+    network = LSTMLayer(network, num_units=1, nonlinearity=tanh)
+
+    network = DenseLayer(network, num_units=nb_classes, nonlinearity=activity)
+
+    return network
+
+def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -97,17 +118,17 @@ def build_convpool_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activi
     network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
 
     network = DenseLayer(dropout(network, p=.2),
-            num_units=11, nonlinearity=rectify)
+            num_units=100, nonlinearity=rectify)
 
     network = DenseLayer(dropout(network, p=.2),
-            num_units=5, nonlinearity=rectify)
+            num_units=10, nonlinearity=rectify)
 
     network = DenseLayer(dropout(network, p=.2),
             num_units=nb_classes, nonlinearity=activity)
 
     return network
 
-def build_convpool_mix(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -148,7 +169,7 @@ def build_convpool_mix(input_var, nb_classes, n_chanels=1, input_size=20, activi
 
     return network
 
-def build_convpool_cascade(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_cascade(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -225,17 +246,21 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
     input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
-    network = build_convpool_mix(input_var, 1, 4, 20, activity=sigmoid)
+    network = build_lstm(input_var, 1, 1, 320, activity=sigmoid)
+    '''
     if dnn_strategy == 'dnn':
-        build_convpool_dnn(input_var, 1, 4, 20, activity=sigmoid)
+        build_dnn(input_var, 1, 16, 20, activity=sigmoid)
     elif dnn_strategy == 'conv1d':
-        build_convpool_conv1d(input_var, 1, 4, 20, activity=sigmoid)
+        build_conv1d(input_var, 1, 16, 20, activity=sigmoid)
     elif dnn_strategy == 'cascade':
-        build_convpool_cascade(input_var, 1, 4, 20, activity=sigmoid)
+        build_cascade(input_var, 1, 16, 20, activity=sigmoid)
+    elif dnn_strategy == 'lstm':
+        build_lstm(input_var, 1, 16, 20, activity=sigmoid)
     elif dnn_strategy == 'mix':
         pass
     else:
         raise AttributeError("This dnn_strategy is not supported!")
+    '''
 
     l_output = get_output(network)
     loss = self_binary_crossentropy(l_output, target_var, possitive_punishment=possitive_punishment).mean()
@@ -288,10 +313,12 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
             train_batches += 1
 
         #validate
-        _, val_err, val_acc, _, _ = val(X_val, y_val)
-        _, test_err, test_acc, _, _ = val(X_test, y_test)
+        _, val_err, val_acc, val_wr1, val_wr2 = val(X_val, y_val)
+        _, test_err, test_acc, test_wr1, test_wr2 = val(X_test, y_test)
 
         # Then we print the results for this epoch:
+        for ix in len([0.5, 0.6, 0.7, 0.8, 0.9]:
+            sys.stdout.write("  validation loss:\t\t{.6f}\n".format(val_err / 1))
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{:.6f}\n".format(train_err / train_batches))
@@ -306,9 +333,9 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     print 'Done!'
 
 if __name__ == '__main__':
-    learning_rate_list = [0.005]
+    learning_rate_list = [0.0005]
     dnn_strategy_list = ['mix', 'cascade', 'conv1d']
-    possitive_punishment_list = [1]
+    possitive_punishment_list = [0.3, 0.5, 0.7]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:

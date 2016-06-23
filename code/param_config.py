@@ -15,25 +15,21 @@ class ParamConfig:
         self.n_classes = 2
         self.before = 20
         self.after = 5
-        self.interval = 1
-        self.left4test = 20  #每只股票的最后n个留下来作为测试机，做成n个横截面
+        self.interval = 2
+        self.left4test = 1  #每只股票的最后n个留下来作为测试机，做成n个横截面
         self.threhold_up_down = 0.02
         self.fluctuation_threhold = 0.0
-        self.thread_size = 10
+        self.thread_size = 1
         self.is_dis = True
         # cols_dimension = ['open', 'high', 'low', 'close', 'amount']
-        self.cols_dimension = ['close']
-        self.start_time = '20070101'
-        self.end_time = '20151231'
-        self.sql = "SELECT * FROM price_amount_ratio WHERE name like '%银行' and time between '20070101' and '20150202'"
-        self.all_sql = "SELECT * FROM price_amount_ratio WHERE time between '20070101' and '20150202'"
-        self.sql_prefix = "SELECT * FROM price_amount_ratio WHERE code in ("
-        self.sql_postfix = ") and time between '" + self.start_time + "' and '" + self.end_time + "'"
+        self.cols_dimension = ['open', 'close', 'high', 'low', 'MA3', 'MA5', 'MA10', 'MA20', 'MA30', 'MA60', 'EMA3', 'EMA5', 'EMA10', 'EMA20', 'EMA30', 'EMA60']
+        self.sql_prefix = "SELECT * FROM tech_ind WHERE symbol in ("
+        self.sql_postfix = ")"
         self.code_file = "../../data/CodeMap.xls"
         self.ip = "10.100.47.147"
         self.user = "root"
         self.passwd = "rootsafe"
-        self.database = "StockFeatureBase"
+        self.database = "Tech_Indicators"
         self.port = 8080
 
 
