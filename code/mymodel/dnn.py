@@ -29,7 +29,7 @@ def load_dataset(file_path):
             phrases = line.split()
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
-            X.append([features[:20], features[20:40], features[40:60], features[60:80]])
+            X.append([features[ix*20:(ix+1)*20] for ix in range(16)])
             value = float(phrases[-1])
             values.append(value)
             if value <= 0:
@@ -40,8 +40,8 @@ def load_dataset(file_path):
     X = np.array(X).astype(np.float32)
     y = np.array(y).astype(np.int32)
     values = np.array(values).astype(np.float32)
-    train_size = int(0.7 * len(y))
-    val_size = int(0.15 * len(y))
+    train_size = int(0.6 * len(y))
+    val_size = int(0.2 * len(y))
     X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
     y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
     print len(X_train), len(X_val), len(X_test)
@@ -52,7 +52,7 @@ def load_dataset(file_path):
     # (It doesn't matter how we do this as long as we can read them again.)
     return X, y, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
-def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -61,7 +61,33 @@ def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=sof
     :return: a pointer to the output of last layer
     """
     # Input layer
-    network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+    network = InputLayer(shape=(None, 1, input_size), input_var=input_var)
+
+    #network = ReshapeLayer(network, (([0], n_chanels, reshaped_input_size)))
+
+    network = DenseLayer(dropout(network, p=.3),
+            num_units=100, nonlinearity=rectify)
+
+    network = DenseLayer(dropout(network, p=.3),
+            num_units=10, nonlinearity=rectify)
+
+    network = DenseLayer(dropout(network, p=.3),
+            num_units=nb_classes, nonlinearity=activity)
+
+    return network
+
+def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
+    """
+    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+
+    :param input_vars: list of EEG images (one image per time window)
+    :param nb_classes: number of classes
+    :return: a pointer to the output of last layer
+    """
+    # Input layer
+    network = InputLayer(shape=(None, 1, input_size), input_var=input_var)
+
+    network = ReshapeLayer(network, (([0], n_chanels, reshaped_input_size)))
 
     network = Conv1DLayer(network, 1024, 5)
 
@@ -85,7 +111,7 @@ def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, activity=sof
 
     return network
 
-def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -94,9 +120,9 @@ def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, activity=softm
     :return: a pointer to the output of last layer
     """
     # Input layer
-    network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+    network = InputLayer(shape=(None, 1, input_size), input_var=input_var)
 
-    network = ReshapeLayer(network, ((None, 16, 20)))
+    network = ReshapeLayer(network, (([0], n_chanels, reshaped_input_size)))
 
     network = LSTMLayer(network, num_units=8, nonlinearity=tanh)
 
@@ -106,7 +132,7 @@ def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, activity=softm
 
     return network
 
-def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -115,29 +141,9 @@ def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, activity=softma
     :return: a pointer to the output of last layer
     """
     # Input layer
-    network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+    input = InputLayer(shape=(None, 1, input_size), input_var=input_var)
 
-    network = DenseLayer(dropout(network, p=.2),
-            num_units=100, nonlinearity=rectify)
-
-    network = DenseLayer(dropout(network, p=.2),
-            num_units=10, nonlinearity=rectify)
-
-    network = DenseLayer(dropout(network, p=.2),
-            num_units=nb_classes, nonlinearity=activity)
-
-    return network
-
-def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
-    """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
-
-    :param input_vars: list of EEG images (one image per time window)
-    :param nb_classes: number of classes
-    :return: a pointer to the output of last layer
-    """
-    # Input layer
-    input = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+    input = ReshapeLayer(input, (([0], n_chanels, reshaped_input_size)))
 
     conv1 = Conv1DLayer(input, 1024, 5)
 
@@ -169,7 +175,7 @@ def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, activity=softma
 
     return network
 
-def build_cascade(input_var, nb_classes, n_chanels=1, input_size=20, activity=softmax):
+def build_cascade(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
 
@@ -178,7 +184,9 @@ def build_cascade(input_var, nb_classes, n_chanels=1, input_size=20, activity=so
     :return: a pointer to the output of last layer
     """
     # Input layer
-    network = InputLayer(shape=(None, n_chanels, input_size), input_var=input_var)
+    network = InputLayer(shape=(None, 1, input_size), input_var=input_var)
+
+    network = ReshapeLayer(network, (([0], n_chanels, reshaped_input_size)))
 
     network = Conv1DLayer(network, 1024, 5)
 
@@ -246,7 +254,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
     input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
-    network = build_lstm(input_var, 1, 1, 320, activity=sigmoid)
+    network = build_lstm(input_var, 1, 16, 320, 20, activity=sigmoid)
     '''
     if dnn_strategy == 'dnn':
         build_dnn(input_var, 1, 16, 20, activity=sigmoid)
