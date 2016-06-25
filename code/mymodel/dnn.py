@@ -29,7 +29,7 @@ def load_dataset(file_path):
             phrases = line.split()
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
-            X.append([features[ix*20:(ix+1)*20] for ix in range(16)])
+            X.append([features])
             value = float(phrases[-1])
             values.append(value)
             if value <= 0:
@@ -254,21 +254,19 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
     input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
-    network = build_lstm(input_var, 1, 16, 320, 20, activity=sigmoid)
-    '''
+    network = build_mix(input_var, 1, 16, 320, 20, activity=sigmoid)
     if dnn_strategy == 'dnn':
-        build_dnn(input_var, 1, 16, 20, activity=sigmoid)
+        build_dnn(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'conv1d':
-        build_conv1d(input_var, 1, 16, 20, activity=sigmoid)
+        build_conv1d(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'cascade':
-        build_cascade(input_var, 1, 16, 20, activity=sigmoid)
+        build_cascade(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'lstm':
-        build_lstm(input_var, 1, 16, 20, activity=sigmoid)
+        build_lstm(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'mix':
         pass
     else:
         raise AttributeError("This dnn_strategy is not supported!")
-    '''
 
     l_output = get_output(network)
     loss = self_binary_crossentropy(l_output, target_var, possitive_punishment=possitive_punishment).mean()
@@ -328,15 +326,15 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
             sys.stdout.write("  validation win rate loss:\t\t{}\n".format(val_wr1[ix]))
             sys.stdout.write("  validation possitive num:\t\t{}\n".format(val_wr2[ix]))
-            sys.stdout.write("  test win rate loss:\t\t{}\n".format(test_wr1[ix]))
-            sys.stdout.write("  test possitive num:\t\t{}\n".format(test_wr2[ix]))
+            sys.stdout.write("  test win rate loss:\t\t\t{}\n".format(test_wr1[ix]))
+            sys.stdout.write("  test possitive num:\t\t\t{}\n".format(test_wr2[ix]))
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{}\n".format(train_err / train_batches))
         sys.stdout.write("  training loss:\t\t{}\n".format(train_acc / train_batches))
         sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{} %\n".format(val_acc * 100))
-        sys.stdout.write("  test loss:\t\t{}\n".format(test_err / 1))
+        sys.stdout.write("  test loss:\t\t\t{}\n".format(test_err / 1))
         sys.stdout.write("  test accuracy:\t\t{} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
         sys.stdout.flush()
@@ -344,9 +342,9 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     print 'Done!'
 
 if __name__ == '__main__':
-    learning_rate_list = [0.0005]
-    dnn_strategy_list = ['mix', 'cascade', 'conv1d']
-    possitive_punishment_list = [0.3, 0.5, 0.7]
+    learning_rate_list = [0.001, 0.0005]
+    dnn_strategy_list = ['dnn', 'lstm', 'conv1d', 'mix', 'cascade']
+    possitive_punishment_list = [0.3, 0.5, 0.7, 1]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:
