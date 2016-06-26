@@ -345,7 +345,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.flush()
 
         #sotre for gpu
-        with open('../../model/' + dnn_strategy + '/' + str(epoch) + '.model', 'w') as f:
+        with open('../../model/' + dnn_strategy + '/' + 'learning_rate' + str(learning_rate) + '_punishment' + str(possitive_punishment) + '_epoch' + str(epoch) + '.model', 'w') as f:
             cPickle.dump(network, f, protocol=cPickle.HIGHEST_PROTOCOL)
 
     print 'Done!'
