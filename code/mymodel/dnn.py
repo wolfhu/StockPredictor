@@ -340,13 +340,47 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-        #sotre
+        #sotre for gpu
         with open('../../model/' + dnn_strategy + '/' + str(epoch) + '.model', 'w') as f:
             cPickle.dump(network, f, protocol=cPickle.HIGHEST_PROTOCOL)
 
     print 'Done!'
 
+def predict(model_path):
+    with open(model_path, 'r') as f:
+        network = cPickle.load(f)
+
+    input_var = T.ftensor3('X')
+    target_var = T.imatrix('y')
+    predict_prediction = get_output(network, deterministic=True)
+    predict_acc = binary_accuracy(predict_prediction, target_var).mean()
+
+    # calculate win rate
+    win_rate_result1 = []
+    win_rate_result2 = []
+    for win_rate_threhold in [0.5, 0.6, 0.7, 0.8, 0.9]:
+        tmp1 = T.sum(T.switch(T.and_(T.gt(predict_prediction, win_rate_threhold), T.eq(target_var, 1)), 1, 0),
+                     dtype=theano.config.floatX)
+        tmp2 = T.sum(T.switch(T.gt(predict_prediction, win_rate_threhold), 1, 0), dtype=theano.config.floatX)
+        test_win_rate = (tmp1 + 0.00001) / (tmp2 + 0.00001)
+        win_rate_result1.append(test_win_rate)
+        win_rate_result2.append(tmp1)
+
+    predict = theano.function([input_var, target_var], [predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
+
+    X, y, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
+    predict_prediction, predict_acc, win_rate_result1, win_rate_result2 = predict(X, y)
+
+    for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
+        sys.stdout.write("  predict win rate loss:\t\t\t{}\n".format(win_rate_result1[ix]))
+        sys.stdout.write("  predict possitive num:\t\t\t{}\n".format(win_rate_result2[ix]))
+    sys.stdout.write("  predict accuracy:\t\t{} %\n".format(predict_acc * 100))
+
+    sys.stdout.write(predict_prediction)
+    sys.stdout.flush()
+
 if __name__ == '__main__':
+    '''-------------Train-------------
     learning_rate_list = [0.001, 0.0005]
     dnn_strategy_list = ['dnn', 'lstm', 'conv1d', 'mix', 'cascade']
     possitive_punishment_list = [0.3, 0.5, 0.7, 1]
@@ -357,3 +391,7 @@ if __name__ == '__main__':
                 sys.stdout.write('learning_rate is {}, dnn_strategy is {}, possitive_punishment is {}\n'.format(learning_rate, dnn_strategy, possitive_punishment))
                 sys.stdout.flush()
                 run_dnn(learning_rate, dnn_strategy, possitive_punishment)
+    '''
+
+    '''-------------Predict-------------'''
+    predict('../../model/dnn/1.model')

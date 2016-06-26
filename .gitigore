@@ -1,4 +1,6 @@
-*.pyc
-*.txt
+.pyc
+.txt
 err
-*.model
+.model
+data/
+test/
