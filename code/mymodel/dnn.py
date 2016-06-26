@@ -8,6 +8,7 @@ np.random.seed(1234)
 
 import theano
 import theano.tensor as T
+from six.moves import cPickle
 
 import lasagne
 # from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer
@@ -54,7 +55,7 @@ def load_dataset(file_path):
 
 def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
 
     :param input_vars: list of EEG images (one image per time window)
     :param nb_classes: number of classes
@@ -78,7 +79,7 @@ def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_
 
 def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
 
     :param input_vars: list of EEG images (one image per time window)
     :param nb_classes: number of classes
@@ -113,7 +114,7 @@ def build_conv1d(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_inp
 
 def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
 
     :param input_vars: list of EEG images (one image per time window)
     :param nb_classes: number of classes
@@ -134,7 +135,7 @@ def build_lstm(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input
 
 def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
 
     :param input_vars: list of EEG images (one image per time window)
     :param nb_classes: number of classes
@@ -177,7 +178,7 @@ def build_mix(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_
 
 def build_cascade(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
-    Builds the complete network with 1D-conv layer to integrate time from sequences of EEG images.
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
 
     :param input_vars: list of EEG images (one image per time window)
     :param nb_classes: number of classes
@@ -302,7 +303,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         test_label_list.append(tmp_test_label)
     '''
 
-    num_epochs = 150
+    num_epochs = 2
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -338,6 +339,10 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.write("  test accuracy:\t\t{} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
         sys.stdout.flush()
+
+        #sotre
+        with open('../../model/' + dnn_strategy + '/' + str(epoch) + '.model', 'w') as f:
+            cPickle.dump(network, f, protocol=cPickle.HIGHEST_PROTOCOL)
 
     print 'Done!'
 

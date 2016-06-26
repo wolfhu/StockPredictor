@@ -1,6 +1,4 @@
-.pyc
-.txt
-.zip
-result
+*.pyc
+*.txt
 err
-data/
+*.model
