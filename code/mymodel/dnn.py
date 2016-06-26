@@ -29,7 +29,7 @@ def load_dataset(file_path):
     with open(file_path, 'r') as f:
         for line in f.readlines():
             phrases = line.split()
-            label = int(phrases[0])
+            label = int(phrases[0].split(';')[0])
             labels.append(label)
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
@@ -389,7 +389,7 @@ def predict(model_path):
     sys.stdout.flush()
 
 if __name__ == '__main__':
-    '''-------------Train-------------
+    '''-------------Train-------------'''
     learning_rate_list = [0.001, 0.0005]
     dnn_strategy_list = ['dnn', 'lstm', 'conv1d', 'mix', 'cascade']
     possitive_punishment_list = [0.3, 0.5, 0.7, 1]
@@ -400,7 +400,6 @@ if __name__ == '__main__':
                 sys.stdout.write('learning_rate is {}, dnn_strategy is {}, possitive_punishment is {}\n'.format(learning_rate, dnn_strategy, possitive_punishment))
                 sys.stdout.flush()
                 run_dnn(learning_rate, dnn_strategy, possitive_punishment)
-    '''
 
-    '''-------------Predict-------------'''
-    predict('../../model/dnn/1.model')
+    '''-------------Predict-------------
+    predict('../../model/dnn/1.model')'''
