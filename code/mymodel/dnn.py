@@ -25,9 +25,12 @@ def load_dataset(file_path):
     X = []
     y = []
     values = []
+    labels = []
     with open(file_path, 'r') as f:
         for line in f.readlines():
             phrases = line.split()
+            label = int(phrases[0])
+            labels.append(label)
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
             X.append([features])
@@ -40,6 +43,7 @@ def load_dataset(file_path):
     # We reserve the last 10000 training examples for validation.
     X = np.array(X).astype(np.float32)
     y = np.array(y).astype(np.int32)
+    labels = np.array(labels).astype(np.int32)
     values = np.array(values).astype(np.float32)
     train_size = int(0.6 * len(y))
     val_size = int(0.2 * len(y))
@@ -51,7 +55,7 @@ def load_dataset(file_path):
 
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
-    return X, y, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
+    return X, y, labels, values, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
 def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
@@ -292,7 +296,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/data.txt')
+    _, _, _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/data.txt')
     '''
     test_data_list = []
     test_label_list = []
@@ -303,7 +307,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         test_label_list.append(tmp_test_label)
     '''
 
-    num_epochs = 2
+    num_epochs = 30
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -365,22 +369,23 @@ def predict(model_path):
         win_rate_result1.append(test_win_rate)
         win_rate_result2.append(tmp1)
 
-    batch_size = 128
-    X, y, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
-
     input_layer = get_all_layers(network)[0]
     predict = theano.function(inputs=[input_layer.input_var, target_var],
                               outputs=[predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)],
                               on_unused_input='warn')
-
+    X, y, labels, values, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
     predict_prediction, predict_acc, win_rate_result1, win_rate_result2 = predict(X, y)
 
     for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
         sys.stdout.write("  predict win rate loss:\t\t\t{}\n".format(win_rate_result1[ix]))
         sys.stdout.write("  predict possitive num:\t\t\t{}\n".format(win_rate_result2[ix]))
-    sys.stdout.write("  predict accuracy:\t\t{} %\n".format(predict_acc * 100))
+    sys.stdout.write("  predict accuracy:\t\t\t{} %\n".format(predict_acc * 100))
 
-    sys.stdout.write(predict_prediction)
+    #output predict result
+    with open('../../data/prediction', 'w') as f:
+        for ix in xrange(len(labels)):
+            line = str(labels[ix]) + '\t' + str(values(ix)) + '\t' + str(predict_prediction[ix][0]) + '\n'
+            f.write(line)
     sys.stdout.flush()
 
 if __name__ == '__main__':
