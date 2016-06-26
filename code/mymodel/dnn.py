@@ -350,7 +350,6 @@ def predict(model_path):
     with open(model_path, 'r') as f:
         network = cPickle.load(f)
 
-    input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
     predict_prediction = get_output(network, deterministic=True)
     predict_acc = binary_accuracy(predict_prediction, target_var).mean()
@@ -370,7 +369,7 @@ def predict(model_path):
     X, y, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
 
     input_layer = get_all_layers(network)[0]
-    predict = theano.function(inputs=input_layer.input_var,
+    predict = theano.function(inputs=[input_layer.input_var, target_var],
                               outputs=[predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)],
                               on_unused_input='warn')
 
