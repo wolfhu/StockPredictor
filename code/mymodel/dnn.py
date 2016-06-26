@@ -16,7 +16,7 @@ from lasagne.layers import Conv2DLayer, MaxPool2DLayer, InputLayer
 from lasagne.layers import DenseLayer, ElemwiseMergeLayer, FlattenLayer
 from lasagne.layers import ConcatLayer, ReshapeLayer, get_output_shape
 from lasagne.layers import Conv1DLayer, DimshuffleLayer, LSTMLayer, SliceLayer
-from lasagne.layers import MaxPool1DLayer, dropout, get_output, get_all_params
+from lasagne.layers import MaxPool1DLayer, dropout, get_output, get_all_params, get_all_layers
 from lasagne.updates import adagrad
 from lasagne.nonlinearities import softmax, sigmoid, rectify, tanh
 from lasagne.objectives import binary_accuracy
@@ -366,9 +366,14 @@ def predict(model_path):
         win_rate_result1.append(test_win_rate)
         win_rate_result2.append(tmp1)
 
-    predict = theano.function([input_var, target_var], [predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
-
+    batch_size = 128
     X, y, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
+
+    input_layer = get_all_layers(network)[0]
+    predict = theano.function(inputs=input_layer.input_var,
+                              outputs=[predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)],
+                              on_unused_input='warn')
+
     predict_prediction, predict_acc, win_rate_result1, win_rate_result2 = predict(X, y)
 
     for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
