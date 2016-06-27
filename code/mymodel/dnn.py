@@ -57,6 +57,43 @@ def load_dataset(file_path):
     # (It doesn't matter how we do this as long as we can read them again.)
     return X, y, labels, values, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
 
+def build_partitioned(input_var, nb_classes, n_chanels, input_size, reshaped_input_size, activity=softmax):
+    """
+    Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
+
+    :param input_vars: list of EEG images (one image per time window)
+    :param nb_classes: number of classes
+    :return: a pointer to the output of last layer
+    """
+    # Input layer
+    input_layer = InputLayer(shape=(None, 1, input_size), input_var=input_var)
+
+    input_layer = ReshapeLayer(input_layer, (([0], n_chanels, reshaped_input_size)))
+
+    #slice for partition
+    input_layers = []
+    for ix in range(n_chanels):
+        input_layers.append(SliceLayer(input_layer), indices=slice(ix, ix+1), axis=1)
+
+    #dnn
+    networks1 = []
+    for input_layer in input_layers:
+        networks1.append(DenseLayer(dropout(input_layer, p=.1),
+            num_units=20, nonlinearity=rectify))
+
+    networks2 = []
+    for network in networks1:
+        networks2.append(DenseLayer(dropout(network, p=.1),
+                                   num_units=4, nonlinearity=rectify))
+
+
+    network = ConcatLayer(networks2)
+
+    network = DenseLayer(dropout(network, p=.5),
+            num_units=nb_classes, nonlinearity=activity)
+
+    return network
+
 def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_size=20, activity=softmax):
     """
     Builds the complete network with 1D-conv1d layer to integrate time from sequences of EEG images.
@@ -268,6 +305,8 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         build_cascade(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'lstm':
         build_lstm(input_var, 1, 16, 320, 20, activity=sigmoid)
+    elif dnn_strategy == 'partitioned':
+        build_partitioned(input_var, 1, 16, 320, 20, activity=sigmoid)
     elif dnn_strategy == 'mix':
         pass
     else:
@@ -307,7 +346,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         test_label_list.append(tmp_test_label)
     '''
 
-    num_epochs = 30
+    num_epochs = 100
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -384,15 +423,15 @@ def predict(model_path):
     #output predict result
     with open('../../data/prediction', 'w') as f:
         for ix in xrange(len(labels)):
-            line = str(labels[ix]) + '\t' + str(values(ix)) + '\t' + str(predict_prediction[ix][0]) + '\n'
+            line = str(labels[ix]) + '\t' + str(values[ix]) + '\t' + str(predict_prediction[ix][0]) + '\n'
             f.write(line)
     sys.stdout.flush()
 
 if __name__ == '__main__':
     '''-------------Train-------------'''
-    learning_rate_list = [0.001, 0.0005]
-    dnn_strategy_list = ['dnn', 'lstm', 'conv1d', 'mix', 'cascade']
-    possitive_punishment_list = [0.3, 0.5, 0.7, 1]
+    learning_rate_list = [0.005]
+    dnn_strategy_list = ['partitioned', 'dnn', 'lstm', 'conv1d', 'mix', 'cascade']
+    possitive_punishment_list = [0.3, 0.5]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:

@@ -136,12 +136,15 @@ def query(sql_list):
     feature_cols = []
     for ix in xrange(config.before):
         for col in config.cols_dimension:
-            feature_cols.append(col + str(ix))
+            feature_cols.append(col + '_' + str(ix))
     feature_cols.extend(['time', 'code', 'value', 'label'])
     train_data = pd.DataFrame(train_result, columns=feature_cols)
 
-    #标准化test_result
+    #1*n的特征向量以什么排序，以时间还是以名称, 初始是以时间，若是以名称的话需要进行以下转换
+    feature_cols.sort()
+    train_data = train_data[feature_cols]
 
+    #标准化test_result
     test_original_data = [[x[i] for x in test_result] for i in xrange(config.left4test)]
     test_data_list = []
     for test_original_datum in test_original_data:
