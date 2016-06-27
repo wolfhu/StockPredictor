@@ -73,7 +73,7 @@ def build_partitioned(input_var, nb_classes, n_chanels, input_size, reshaped_inp
     #slice for partition
     input_layers = []
     for ix in range(n_chanels):
-        input_layers.append(SliceLayer(input_layer), indices=slice(ix, ix+1), axis=1)
+        input_layers.append(SliceLayer(input_layer, indices=slice(ix, ix+1), axis=1))
 
     #dnn
     networks1 = []
@@ -379,7 +379,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{}\n".format(train_err / train_batches))
-        sys.stdout.write("  training loss:\t\t{}\n".format(train_acc / train_batches))
+        sys.stdout.write("  training accuracy:\t\t{}\n".format(train_acc / train_batches))
         sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{} %\n".format(val_acc * 100))
         sys.stdout.write("  test loss:\t\t\t{}\n".format(test_err / 1))
