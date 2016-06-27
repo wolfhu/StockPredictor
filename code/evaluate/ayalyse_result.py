@@ -84,13 +84,11 @@ def read():
             ix += 1
     return result_list
 
-
-
 if __name__ == '__main__':
     result_list = read()
     #filtering
-    result_list = filter(lambda item: item.val_pos_num_05 > 200 and item.test_pos_num_05 > 200, result_list)
+    result_list = filter(lambda item: item.val_pos_num_05 > 400,  result_list)
 
-    result_list.sort(key=lambda item: (item.val_winrate_05 + item.test_winrate_05) / 2, reverse=True)
+    result_list.sort(key=lambda item: 3 * (item.val_winrate_05 + item.test_winrate_05) + item.val_acc + item.test_acc, reverse=True)
     for ix in xrange(10):
         print result_list[ix]

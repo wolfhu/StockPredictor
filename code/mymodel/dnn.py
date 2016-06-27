@@ -45,8 +45,8 @@ def load_dataset(file_path):
     y = np.array(y).astype(np.int32)
     labels = np.array(labels).astype(np.int32)
     values = np.array(values).astype(np.float32)
-    train_size = int(0.6 * len(y))
-    val_size = int(0.2 * len(y))
+    train_size = int(1 * len(y))
+    val_size = int(0 * len(y))
     X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
     y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
     print len(X_train), len(X_val), len(X_test)
@@ -56,6 +56,10 @@ def load_dataset(file_path):
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
     return X, y, labels, values, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
+
+def split(data, ratio=0.5):
+    pre_size = int(ratio * len(data))
+    return data[:pre_size], data[pre_size:]
 
 def build_partitioned(input_var, nb_classes, n_chanels, input_size, reshaped_input_size, activity=softmax):
     """
@@ -339,7 +343,12 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/data.txt')
+    _, _, _, _, X_train, y_train, _, _, _, _, _, _ = load_dataset('../../data/data.txt')
+    X, y, labels, values, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
+    X_pre, _ = split(X, 0.5)
+    y_pre, _ = split(y, 0.5)
+    X_val, X_test = split(X_pre, 0.5)
+    y_val, y_test = split(y_pre, 0.5)
     '''
     test_data_list = []
     test_label_list = []
@@ -417,6 +426,10 @@ def predict(model_path):
                               outputs=[predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)],
                               on_unused_input='warn')
     X, y, labels, values, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
+    _, X = split(X, 0.5)
+    _, y = split(y, 0.5)
+    _, labels = split(labels, 0.5)
+    _, values = split(values, 0.5)
     predict_prediction, predict_acc, win_rate_result1, win_rate_result2 = predict(X, y)
 
     for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):

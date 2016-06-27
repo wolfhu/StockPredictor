@@ -55,10 +55,10 @@ for name, single_data in train_data.groupby('symbol'):
     tmp_data = single_data.drop(['date', 'symbol', 'value', 'label'], axis=1)
     features = tmp_data.values.tolist()
     values = single_data['value'].tolist()
-    labels = single_data['label'].tolist()
+    symbols = single_data['symbol'].tolist()
     with open('{}{}{}.txt'.format(config.code_file_path, config.file_prefix, name), 'w') as fp:
-        for ix in xrange(len(labels)):
-            fp.write('{};0 {};1 {}\n'.format(labels[ix], " ".join([str(x) for x in features[ix]]), values[ix]))
+        for ix in xrange(len(symbols)):
+            fp.write('{};0 {};1 {}\n'.format(symbols[ix], " ".join([str(x) for x in features[ix]]), values[ix]))
 
 cmd = "rm -f " + config.test_file_path + "/*"
 os.system(cmd)
