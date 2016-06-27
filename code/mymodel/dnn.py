@@ -296,17 +296,21 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end
     input_var = T.ftensor3('X')
     target_var = T.imatrix('y')
-    network = build_mix(input_var, 1, 16, 320, 20, activity=sigmoid)
+
+    features_type = 16
+    perioid = 40
+    features_dim = features_type * perioid
+    network = build_mix(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     if dnn_strategy == 'dnn':
-        build_dnn(input_var, 1, 16, 320, 20, activity=sigmoid)
+        build_dnn(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     elif dnn_strategy == 'conv1d':
-        build_conv1d(input_var, 1, 16, 320, 20, activity=sigmoid)
+        build_conv1d(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     elif dnn_strategy == 'cascade':
-        build_cascade(input_var, 1, 16, 320, 20, activity=sigmoid)
+        build_cascade(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     elif dnn_strategy == 'lstm':
-        build_lstm(input_var, 1, 16, 320, 20, activity=sigmoid)
+        build_lstm(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     elif dnn_strategy == 'partitioned':
-        build_partitioned(input_var, 1, 16, 320, 20, activity=sigmoid)
+        build_partitioned(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     elif dnn_strategy == 'mix':
         pass
     else:
