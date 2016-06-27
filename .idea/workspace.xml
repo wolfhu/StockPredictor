@@ -5,7 +5,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/evaluate/ayalyse_result.py" afterPath="$PROJECT_DIR$/code/evaluate/ayalyse_result.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/mymodel/dnn.py" afterPath="$PROJECT_DIR$/code/mymodel/dnn.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/preprocess/data_acquire.py" afterPath="$PROJECT_DIR$/code/preprocess/data_acquire.py" />
     </list>
     <ignored path="WorkFlow.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -20,7 +19,7 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/StockPredictor-master$indicator.coverage" NAME="indicator Coverage Results" MODIFIED="1466647529393" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/preprocess" />
-    <SUITE FILE_PATH="coverage/StockPredictor-master$ayalyse_result.coverage" NAME="ayalyse_result Coverage Results" MODIFIED="1467008346993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/evaluate" />
+    <SUITE FILE_PATH="coverage/StockPredictor-master$ayalyse_result.coverage" NAME="ayalyse_result Coverage Results" MODIFIED="1467018096892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/evaluate" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -31,21 +30,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dnn.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dnn.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="257">
-              <caret line="433" column="42" selection-start-line="433" selection-start-column="42" selection-end-line="433" selection-end-column="42" />
+            <state relative-caret-position="-1423">
+              <caret line="353" column="20" selection-start-line="353" selection-start-column="20" selection-end-line="353" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ayalyse_result.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="indicator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code/preprocess/indicator.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="591">
+              <caret line="133" column="9" selection-start-line="133" selection-start-column="9" selection-end-line="133" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ayalyse_result.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/code/evaluate/ayalyse_result.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="87" column="0" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
+            <state relative-caret-position="451">
+              <caret line="93" column="77" selection-start-line="93" selection-start-column="77" selection-end-line="93" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="data_correction.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code/preprocess/data_correction.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="311">
+              <caret line="28" column="27" selection-start-line="28" selection-start-column="27" selection-end-line="28" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -133,8 +152,8 @@
         <option value="$PROJECT_DIR$/code/param_config.py" />
         <option value="$PROJECT_DIR$/code/preprocess/indicator_acquire.py" />
         <option value="$PROJECT_DIR$/code/preprocess/run_all.py" />
-        <option value="$PROJECT_DIR$/code/evaluate/ayalyse_result.py" />
         <option value="$PROJECT_DIR$/code/preprocess/data_acquire.py" />
+        <option value="$PROJECT_DIR$/code/evaluate/ayalyse_result.py" />
         <option value="$PROJECT_DIR$/code/mymodel/dnn.py" />
       </list>
     </option>
@@ -682,7 +701,28 @@
       <option name="project" value="LOCAL" />
       <updated>1466670921319</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="add partitioned structure">
+      <created>1467010380898</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1467010380898</updated>
+    </task>
+    <task id="LOCAL-00008" summary="flexible feature dim">
+      <created>1467010632497</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1467010632497</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fix bug">
+      <created>1467011224174</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1467011224174</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -724,7 +764,10 @@
     <MESSAGE value="sync" />
     <MESSAGE value="add indicators" />
     <MESSAGE value="dnn for mulitiple indicators" />
-    <option name="LAST_COMMIT_MESSAGE" value="dnn for mulitiple indicators" />
+    <MESSAGE value="add partitioned structure" />
+    <MESSAGE value="flexible feature dim" />
+    <MESSAGE value="fix bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -831,14 +874,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Code/Evaluate/evaluate.py" />
-    <entry file="file://$PROJECT_DIR$/code/preprocess/data_correction.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="20" column="43" selection-start-line="20" selection-start-column="43" selection-end-line="20" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/common.conf" />
     <entry file="file://$PROJECT_DIR$/config/pre_val_upload_mv.sh">
       <provider selected="true" editor-type-id="text-editor">
@@ -980,16 +1015,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire2.py" />
-    <entry file="file://$PROJECT_DIR$/code/preprocess/indicator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="449">
-          <caret line="115" column="11" selection-start-line="115" selection-start-column="11" selection-end-line="115" selection-end-column="11" />
-          <folding>
-            <element signature="e#24#60#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/code/preprocess/data_norm.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="349">
@@ -1026,10 +1051,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/evaluate/ayalyse_result.py">
+    <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="87" column="0" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
+        <state relative-caret-position="419">
+          <caret line="143" column="23" selection-start-line="143" selection-start-column="23" selection-end-line="143" selection-end-column="23" />
           <folding />
         </state>
       </provider>
@@ -1044,18 +1069,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/preprocess/data_acquire.py">
+    <entry file="file://$PROJECT_DIR$/code/preprocess/data_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="143" column="23" selection-start-line="143" selection-start-column="23" selection-end-line="143" selection-end-column="23" />
+        <state relative-caret-position="311">
+          <caret line="28" column="27" selection-start-line="28" selection-start-column="27" selection-end-line="28" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/preprocess/indicator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="591">
+          <caret line="133" column="9" selection-start-line="133" selection-start-column="9" selection-end-line="133" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/code/mymodel/dnn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="433" column="42" selection-start-line="433" selection-start-column="42" selection-end-line="433" selection-end-column="42" />
+        <state relative-caret-position="-1423">
+          <caret line="353" column="20" selection-start-line="353" selection-start-column="20" selection-end-line="353" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/evaluate/ayalyse_result.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="451">
+          <caret line="93" column="77" selection-start-line="93" selection-start-column="77" selection-end-line="93" selection-end-column="77" />
           <folding />
         </state>
       </provider>

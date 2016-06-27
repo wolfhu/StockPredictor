@@ -434,8 +434,8 @@ def predict(model_path):
 if __name__ == '__main__':
     '''-------------Train-------------'''
     learning_rate_list = [0.005]
-    dnn_strategy_list = ['partitioned', 'dnn', 'lstm', 'conv1d', 'mix', 'cascade']
-    possitive_punishment_list = [0.3, 0.5]
+    dnn_strategy_list = ['partitioned']
+    possitive_punishment_list = [0.5]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:
