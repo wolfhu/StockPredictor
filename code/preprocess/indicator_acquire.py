@@ -48,7 +48,9 @@ class StockConsumer(threading.Thread):
                 break
 
             #有的没有数据，过滤掉
-            assert len(single_stock_data) > config.before + config.after + config.interval * config.left4test
+            if len(single_stock_data) < config.before + config.after + config.interval * config.left4test:
+                print '{} does not have enough data'.format(single_stock_data.ix[0, 'symbol'])
+                continue
 
             features_and_result_train = []
             features_and_result_test = []
@@ -73,7 +75,12 @@ class StockConsumer(threading.Thread):
 
             features_and_result_test = features_and_result_train[-config.left4test:]
             features_and_result_train = features_and_result_train[:-config.left4test]
-            print single_stock_data.loc[0, 'symbol'], len(single_stock_data), len(features_and_result_train), len(features_and_result_test)
+            # 有的没有数据，过滤掉
+            if len(features_and_result_train) == 0:
+                print '{} does not have enough data'.format(single_stock_data.ix[0, 'symbol'])
+                continue
+            else:
+                print single_stock_data.loc[0, 'symbol'], len(single_stock_data), len(features_and_result_train), len(features_and_result_test)
             self.train_result.extend(features_and_result_train)
             self.test_result.append(features_and_result_test)
             print "A stock has finished and {} stocks left".format(self.queue.qsize())

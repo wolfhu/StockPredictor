@@ -83,7 +83,7 @@ os.system(cmd)
 tmp_data = train_data.drop(['date', 'symbol', 'value', 'label'], axis=1)
 features = tmp_data.values.tolist()
 values = train_data['value'].tolist()
-labels = train_data['label'].tolist()
+symbols = train_data['symbol'].tolist()
 with open('{}{}{}.txt'.format(config.shuffle_file_path, config.file_prefix, 0), 'w') as fp:
-    for ix in xrange(len(labels)):
-        fp.write('{};0 {};1 {}\n'.format(labels[ix], " ".join([str(x) for x in features[ix]]), values[ix]))
+    for ix in xrange(len(symbols)):
+        fp.write('{};0 {};1 {}\n'.format(symbols[ix], " ".join([str(x) for x in features[ix]]), values[ix]))
