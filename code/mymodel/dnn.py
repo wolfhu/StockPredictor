@@ -79,22 +79,27 @@ def build_partitioned(input_var, nb_classes, n_chanels, input_size, reshaped_inp
     for ix in range(n_chanels):
         input_layers.append(SliceLayer(input_layer, indices=slice(ix, ix+1), axis=1))
 
+
     #dnn
-    networks1 = []
+    networks = []
     for input_layer in input_layers:
-        networks1.append(DenseLayer(dropout(input_layer, p=.1),
-            num_units=20, nonlinearity=rectify))
+        '''
+        tmp = DenseLayer(dropout(input_layer, p=.1),
+            num_units=20, nonlinearity=rectify)
+        tmp = DenseLayer(dropout(tmp, p=.1),
+                                   num_units=4, nonlinearity=rectify)
+        '''
+        tmp = Conv1DLayer(input_layer, 8, 5)
+        tmp = MaxPool1DLayer(tmp, 2)
+        tmp = Conv1DLayer(tmp, 8, 5)
+        tmp = MaxPool1DLayer(tmp, 2)
+        networks.append(tmp)
 
-    networks2 = []
-    for network in networks1:
-        networks2.append(DenseLayer(dropout(network, p=.1),
-                                   num_units=4, nonlinearity=rectify))
-
-
-    network = ConcatLayer(networks2)
+    network = ConcatLayer(networks)
 
     network = DenseLayer(dropout(network, p=.5),
             num_units=nb_classes, nonlinearity=activity)
+
 
     return network
 
@@ -294,7 +299,6 @@ def self_binary_crossentropy(output, target, possitive_punishment=1):
     TODO : Rewrite as a scalar, and then broadcast to tensor.
     """
     return -(possitive_punishment * target * T.log(output) + (1.0 - target) * T.log(1.0 - output))
-    #return -(possitive_punishment * target * T.log(output))
 
 def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     #input_var = T.TensorType('float32', ((False,) * 3))()        # Notice the () at the end

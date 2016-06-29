@@ -89,6 +89,6 @@ if __name__ == '__main__':
     #filtering
     result_list = filter(lambda item: item.val_pos_num_05 > 100,  result_list)
 
-    result_list.sort(key=lambda item: 1 * (item.val_winrate_09 + item.test_winrate_09) + 0 * (item.val_acc + item.test_acc), reverse=True)
+    result_list.sort(key=lambda item: 0 * (item.val_winrate_09 + item.test_winrate_09) + 1 * (item.val_acc + item.test_acc), reverse=True)
     for ix in xrange(10):
         print result_list[ix]
