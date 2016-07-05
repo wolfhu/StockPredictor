@@ -16,6 +16,7 @@ from sklearn.cluster import DBSCAN
 #######################
 ## load data ##
 #######################
+'''
 #拿到当前中证800成分股
 corr_df = pd.read_csv(config.corr_file, dtype={'index':str})
 corr_df = corr_df.set_index('index')
@@ -46,7 +47,10 @@ print('Estimated number of cluster data: %d' % cluster_data_num)
 all_stocks = corr_df.index
 valid_stocks = [all_stocks[ix] for ix in range(len(db.labels_)) if db.labels_[ix] != -1]
 sql_list = config.get_sql_by_code([all_stocks[ix] for ix in db.core_sample_indices_])
+'''
 
+codes = get_most_corr_code("000060")
+sql_list = config.get_sql_by_code(codes)
 train_data, test_data_list = query([sql_list])
 
 #######################

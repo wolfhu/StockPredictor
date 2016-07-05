@@ -46,8 +46,8 @@ def load_dataset(file_path):
     labels = np.array(labels).astype(np.int32)
     values = np.array(values).astype(np.float32)
     train_size = int(8 * len(y))
-    X_train, X_val = X[:train_size], X[train_size::]
-    y_train, y_val = y[:train_size], y[train_size::]
+    X_train, X_val = X[:train_size], X[train_size:]
+    y_train, y_val = y[:train_size], y[train_size:]
     print len(X_train), len(X_val)
 
     values_train, values_val = values[:train_size], values[train_size:]
