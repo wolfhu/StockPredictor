@@ -33,6 +33,6 @@ def get_data():
 
 def get_most_corr_code(code):
     corr_df = get_data()
-    codes = list(corr_df.sort(code, ascending=False).index[1:config.same_stock_num+1])
+    codes = list(corr_df.sort(code, ascending=False).index[0:config.same_stock_num+1])
     print "same as {} is {}".format(code, codes)
     return codes
