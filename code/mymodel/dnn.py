@@ -33,7 +33,6 @@ def load_dataset(file_path):
             labels.append(label)
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
-            if (np.any())
             X.append([features])
             value = float(phrases[-1])
             values.append(value)
@@ -46,17 +45,16 @@ def load_dataset(file_path):
     y = np.array(y).astype(np.int32)
     labels = np.array(labels).astype(np.int32)
     values = np.array(values).astype(np.float32)
-    train_size = int(1 * len(y))
-    val_size = int(0 * len(y))
-    X_train, X_val, X_test = X[:train_size], X[train_size:-val_size], X[-val_size:]
-    y_train, y_val, y_test = y[:train_size], y[train_size:-val_size], y[-val_size:]
-    print len(X_train), len(X_val), len(X_test)
+    train_size = int(8 * len(y))
+    X_train, X_val = X[:train_size], X[train_size::]
+    y_train, y_val = y[:train_size], y[train_size::]
+    print len(X_train), len(X_val)
 
     values_train, values_val = values[:train_size], values[train_size:]
 
     # We just return all the arrays in order, as expected in main().
     # (It doesn't matter how we do this as long as we can read them again.)
-    return X, y, labels, values, X_train, y_train, X_val, y_val, X_test, y_test, values_train, values_val
+    return X, y, labels, values, X_train, y_train, X_val, y_val, values_train, values_val
 
 def split(data, ratio=0.5):
     pre_size = int(ratio * len(data))
@@ -349,7 +347,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/800core')
+    _, _, _, _, X_train, y_train, X_val, y_val, _, _ = load_dataset('../../data/800core')
     '''
     test_data_list = []
     test_label_list = []
@@ -378,22 +376,17 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
         #validate
         _, val_err, val_acc, val_wr1, val_wr2 = val(X_val, y_val)
-        _, test_err, test_acc, test_wr1, test_wr2 = val(X_test, y_test)
 
         # Then we print the results for this epoch:
         for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
-            sys.stdout.write("  validation win rate loss:\t\t{}\n".format(val_wr1[ix]))
+            sys.stdout.write("  validation win rate :\t\t{}\n".format(val_wr1[ix]))
             sys.stdout.write("  validation possitive num:\t\t{}\n".format(val_wr2[ix]))
-            sys.stdout.write("  test win rate loss:\t\t\t{}\n".format(test_wr1[ix]))
-            sys.stdout.write("  test possitive num:\t\t\t{}\n".format(test_wr2[ix]))
         sys.stdout.write("Epoch {} of {} took {:.3f}s\n".format(
             epoch + 1, num_epochs, time.time() - start_time))
         sys.stdout.write("  training loss:\t\t{}\n".format(train_err / train_batches))
         sys.stdout.write("  training accuracy:\t\t{}\n".format(train_acc / train_batches))
         sys.stdout.write("  validation loss:\t\t{}\n".format(val_err/1))
         sys.stdout.write("  validation accuracy:\t\t{} %\n".format(val_acc * 100))
-        sys.stdout.write("  test loss:\t\t\t{}\n".format(test_err / 1))
-        sys.stdout.write("  test accuracy:\t\t{} %\n".format(test_acc * 100))
         sys.stdout.write('\n')
         sys.stdout.flush()
 
@@ -426,11 +419,7 @@ def predict(model_path):
     predict = theano.function(inputs=[input_layer.input_var, target_var],
                               outputs=[predict_prediction, predict_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)],
                               on_unused_input='warn')
-    X, y, labels, values, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
-    _, X = split(X, 0.5)
-    _, y = split(y, 0.5)
-    _, labels = split(labels, 0.5)
-    _, values = split(values, 0.5)
+    X, y, labels, values, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
     predict_prediction, predict_acc, win_rate_result1, win_rate_result2 = predict(X, y)
 
     for ix in range(len([0.5, 0.6, 0.7, 0.8, 0.9])):
