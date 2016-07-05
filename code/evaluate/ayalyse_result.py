@@ -3,7 +3,7 @@
 from result import Result
 
 def read():
-    with open('../../data/601088.result', 'r') as f:
+    with open('../../data/50.601088.result', 'r') as f:
         lines = f.readlines()
 
     result_list = []
@@ -87,8 +87,8 @@ def read():
 if __name__ == '__main__':
     result_list = read()
     #filtering
-    result_list = filter(lambda item: item.val_pos_num_05 > 100,  result_list)
+    result_list = filter(lambda item: item.val_pos_num_05 > 20,  result_list)
 
-    result_list.sort(key=lambda item: 0 * (item.val_winrate_09 + item.test_winrate_09) + 1 * (item.val_acc + item.test_acc), reverse=True)
+    result_list.sort(key=lambda item: (item.val_acc + item.test_acc), reverse=True)
     for ix in xrange(10):
         print result_list[ix]

@@ -1,35 +1,53 @@
 # coding: utf-8
 
 import numpy as np
+import pandas as pd
 
 from indicator_acquire import query
+from indicator_acquire import sql_query
 from filtering import filtering
 from data_norm import data_norm
 from param_config import config
 from data_correction import get_most_corr_code
 import os
+import xlrd as xl
+from sklearn.cluster import DBSCAN
 
 #######################
 ## load data ##
 #######################
+#拿到当前中证800成分股
+corr_df = pd.read_csv(config.corr_file, dtype={'index':str})
+corr_df = corr_df.set_index('index')
 
-codes = []#get_most_corr_code("000001")
-codes.append("000001")
-sql_list = [config.get_sql_by_code(codes)]
-'''
-stocks_info = []
-with open(config.code_file, 'r') as f:
-    for line in f.readlines():
-        phrases = line.split(',')
-        code = phrases[0]
-        start_date = phrases[3].replace('-', '')
-        stocks_info.append((code, start_date))
-sql_list = []
-for stock_info in stocks_info:
-    sql = "SELECT time, code, close FROM price_amount_ratio WHERE code = '" + stock_info[0] + "' and time between '" + stock_info[1] + "' and '" + config.end_time +"'"
-    sql_list.append(sql)
-'''
-train_data, test_data_list = query(sql_list)
+codes = xl.open_workbook('./zz800_all_new.xls').sheets()[0]
+valid_codes = set([codes.row_values(ix)[3] for ix in xrange(codes.nrows) if codes.row_values(ix)[6] == '\\N' ])
+index = set(corr_df.index)
+index.difference_update(valid_codes)
+
+corr_df = corr_df.drop(list(index), axis=0)
+corr_df = corr_df.drop(list(index), axis=1)
+
+corr_df = 1.001 - corr_df
+corr_df = corr_df.fillna(0.0)
+
+db = DBSCAN(eps=0.4, min_samples=40, metric='precomputed').fit(corr_df)
+
+core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
+real_labels = [x for x in db.labels_ if x != -1]
+n_clusters = len(set(real_labels))
+cluster_data_num = len(real_labels)
+
+print('Number of core_samples: %d' % len(set(db.core_sample_indices_ )))
+print('Estimated number of clusters: %d' % n_clusters)
+print('Estimated number of cluster data: %d' % cluster_data_num)
+
+all_stocks = corr_df.index
+valid_stocks = [all_stocks[ix] for ix in range(len(db.labels_)) if db.labels_[ix] != -1]
+sql_list = config.get_sql_by_code([all_stocks[ix] for ix in db.core_sample_indices_])
+
+train_data, test_data_list = query([sql_list])
 
 #######################
 ## filter noise ##

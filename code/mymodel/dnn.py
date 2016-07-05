@@ -33,6 +33,7 @@ def load_dataset(file_path):
             labels.append(label)
             features = [float(datum) for datum in phrases[1:-2]]
             features.append(float(phrases[-2].split(';')[0]))
+            if (np.any())
             X.append([features])
             value = float(phrases[-1])
             values.append(value)
@@ -83,16 +84,17 @@ def build_partitioned(input_var, nb_classes, n_chanels, input_size, reshaped_inp
     #dnn
     networks = []
     for input_layer in input_layers:
-        '''
-        tmp = DenseLayer(dropout(input_layer, p=.1),
-            num_units=20, nonlinearity=rectify)
-        tmp = DenseLayer(dropout(tmp, p=.1),
-                                   num_units=4, nonlinearity=rectify)
+
+        tmp = DenseLayer(dropout(input_layer, p=.2),
+            num_units=10, nonlinearity=rectify)
+        tmp = DenseLayer(dropout(tmp, p=.5),
+                                   num_units=3, nonlinearity=rectify)
         '''
         tmp = Conv1DLayer(input_layer, 8, 5)
         tmp = MaxPool1DLayer(tmp, 2)
         tmp = Conv1DLayer(tmp, 8, 5)
         tmp = MaxPool1DLayer(tmp, 2)
+        '''
         networks.append(tmp)
 
     network = ConcatLayer(networks)
@@ -116,13 +118,13 @@ def build_dnn(input_var, nb_classes, n_chanels=1, input_size=20, reshaped_input_
 
     #network = ReshapeLayer(network, (([0], n_chanels, reshaped_input_size)))
 
-    network = DenseLayer(dropout(network, p=.3),
-            num_units=100, nonlinearity=rectify)
+    network = DenseLayer(dropout(network, p=.2),
+            num_units=160, nonlinearity=rectify)
 
-    network = DenseLayer(dropout(network, p=.3),
-            num_units=10, nonlinearity=rectify)
+    network = DenseLayer(dropout(network, p=.5),
+            num_units=60, nonlinearity=rectify)
 
-    network = DenseLayer(dropout(network, p=.3),
+    network = DenseLayer(dropout(network, p=.5),
             num_units=nb_classes, nonlinearity=activity)
 
     return network
@@ -306,7 +308,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
     target_var = T.imatrix('y')
 
     features_type = 16
-    perioid = 40
+    perioid = 20
     features_dim = features_type * perioid
     network = build_mix(input_var, 1, features_type, features_dim, perioid, activity=sigmoid)
     if dnn_strategy == 'dnn':
@@ -347,12 +349,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
 
     val = theano.function([input_var, target_var], [test_prediction, test_loss, test_acc, T.as_tensor_variable(win_rate_result1), T.as_tensor_variable(win_rate_result2)])
 
-    _, _, _, _, X_train, y_train, _, _, _, _, _, _ = load_dataset('../../data/data.txt')
-    X, y, labels, values, _, _, _, _, _, _, _, _ = load_dataset('../../data/predict.txt')
-    X_pre, _ = split(X, 0.5)
-    y_pre, _ = split(y, 0.5)
-    X_val, X_test = split(X_pre, 0.5)
-    y_val, y_test = split(y_pre, 0.5)
+    _, _, _, _, X_train, y_train, X_val, y_val, X_test, y_test, _, _ = load_dataset('../../data/800core')
     '''
     test_data_list = []
     test_label_list = []
@@ -363,7 +360,7 @@ def run_dnn(learning_rate=0.001, dnn_strategy='mix', possitive_punishment=1):
         test_label_list.append(tmp_test_label)
     '''
 
-    num_epochs = 100
+    num_epochs = 150
     batch_size = 128
     for epoch in xrange(num_epochs):
         train_err = 0
@@ -450,9 +447,9 @@ def predict(model_path):
 
 if __name__ == '__main__':
     '''-------------Train-------------'''
-    learning_rate_list = [0.005]
-    dnn_strategy_list = ['partitioned']
-    possitive_punishment_list = [0.5]
+    learning_rate_list = [0.001]
+    dnn_strategy_list = ['dnn', 'paritioned']
+    possitive_punishment_list = [1, 0.5, 0.1]
 
     for dnn_strategy in dnn_strategy_list:
         for learning_rate in learning_rate_list:

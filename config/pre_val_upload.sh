@@ -3,7 +3,7 @@
 #ָ指定输入文件夹，目前只支持文件夹，文件夹下可以有一个或多个文件，
 #但只能为同一类型的输入
 #更改1
-file_path="/home/deepDataBase/bank/dis_shuffle"
+file_path="/home/zz800_feature/vis-40-20-g20"
 if [ ! -d "$file_path" ]
 then
 	echo "file_path isn't exists"
@@ -12,11 +12,11 @@ else
 
 	#自定义参数
 	#更改2
-	real_output_dir="/home/deepDataBase/bank/bin_dis_shuffle/"
+	real_output_dir="/home/zz800_feature/vis-40-20-g20/"
 	txt2proto_param2="0 0"
-	txt2proto_param3="20 1 2"
+	txt2proto_param3="400 1 2"
 	validate_param="0 0"
-	upload_hdfs_dir_prefix="/app/insight/EBG/gushitong/xutao/bank/"
+	upload_hdfs_dir_prefix="/app/insight/EBG/gushitong/xutao/000001same/"
 	real_output_train_dir=${real_output_dir}"train/"
 	real_output_validate_dir=${real_output_dir}"validate/"
 	real_output_test_dir=${real_output_dir}"test/"
