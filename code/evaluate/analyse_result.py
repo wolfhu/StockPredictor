@@ -3,7 +3,7 @@
 from result import Result
 
 def read():
-    with open('../../data/800core100result', 'r') as f:
+    with open('../../data/000060result005', 'r') as f:
         lines = f.readlines()
 
     result_list = []
@@ -19,7 +19,7 @@ def read():
             strategy = tmp[1].split()[-1]
             punishment = float(tmp[2].split()[-1])
             result_template = Result(strategy, learning_rate, punishment)
-            ix += 3
+            ix += 2
         elif 'val' in line:
             val_winrate_05 = float(line.split()[-1])
             ix += 1
@@ -103,7 +103,7 @@ def read():
 if __name__ == '__main__':
     result_list = read()
     #filtering
-    result_list = filter(lambda item: item.val_pos_num_05 > 40,  result_list)
+    result_list = filter(lambda item: item.val_pos_num_05 > 60,  result_list)
 
     result_list.sort(key=lambda item: item.val_acc, reverse=True)
     for ix in xrange(min(10, len(result_list))):

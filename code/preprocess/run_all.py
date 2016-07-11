@@ -16,12 +16,13 @@ from sklearn.cluster import DBSCAN
 #######################
 ## load data ##
 #######################
-'''
+
 #拿到当前中证800成分股
+'''
 corr_df = pd.read_csv(config.corr_file, dtype={'index':str})
 corr_df = corr_df.set_index('index')
 
-codes = xl.open_workbook('./zz800_all_new.xls').sheets()[0]
+codes = xl.open_workbook(config.code_file).sheets()[0]
 valid_codes = set([codes.row_values(ix)[3] for ix in xrange(codes.nrows) if codes.row_values(ix)[6] == '\\N' ])
 index = set(corr_df.index)
 index.difference_update(valid_codes)
@@ -32,7 +33,7 @@ corr_df = corr_df.drop(list(index), axis=1)
 corr_df = 1.001 - corr_df
 corr_df = corr_df.fillna(0.0)
 
-db = DBSCAN(eps=0.4, min_samples=40, metric='precomputed').fit(corr_df)
+db = DBSCAN(eps=0.3, min_samples=21, metric='precomputed').fit(corr_df)
 
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
@@ -43,14 +44,15 @@ cluster_data_num = len(real_labels)
 print('Number of core_samples: %d' % len(set(db.core_sample_indices_ )))
 print('Estimated number of clusters: %d' % n_clusters)
 print('Estimated number of cluster data: %d' % cluster_data_num)
+clusters = [[corr_df.index[ix] for ix in range(len(db.labels_)) if db.labels_[ix] == num] for num in range(n_clusters)]
 
-all_stocks = corr_df.index
-valid_stocks = [all_stocks[ix] for ix in range(len(db.labels_)) if db.labels_[ix] != -1]
-sql_list = config.get_sql_by_code([all_stocks[ix] for ix in db.core_sample_indices_])
+sql_list = []
+sql_list.append(config.get_sql_by_code(clusters[0]))
+
 '''
+codes = get_most_corr_code("000060", '20150101', '20160101')
+sql_list = config.get_sql_by_code(codes, '20150101', '20160601')
 
-codes = get_most_corr_code("000060")
-sql_list = config.get_sql_by_code(codes)
 train_data, test_data_list = query([sql_list])
 
 #######################
