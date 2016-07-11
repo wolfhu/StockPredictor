@@ -51,9 +51,13 @@ sql_list.append(config.get_sql_by_code(clusters[0]))
 
 '''
 codes = get_most_corr_code("000060", '20150101', '20160101')
-sql_list = config.get_sql_by_code(codes, '20150101', '20160601')
 
-train_data, test_data_list = query([sql_list])
+sql_list = []
+code_interval = 100
+for ix in range(0, len(codes), code_interval):
+    sql_list.append(config.get_sql_by_code(codes[ix:min(len(codes), ix+code_interval)], '20150101', '20160601'))
+
+train_data, test_data_list = query(sql_list)
 
 #######################
 ## filter noise ##

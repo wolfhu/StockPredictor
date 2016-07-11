@@ -30,7 +30,6 @@ class ParamConfig:
         self.database = "Tech_Indicators"
         self.port = 8080
 
-
         #filter related
         self.close_up_threhold = 1.09
         self.close_down_threhold = 0.91
@@ -41,13 +40,14 @@ class ParamConfig:
         self.norm_strategy = 'min-max'
 
         #corr realated
-        self.same_stock_num = 30
+        #self.same_stock_num = 30
+        self.simility_threhold = 0.8
 
         #file related
         self.code_file_path = '/home/deepDataBase/000060same/code/'
         self.test_file_path = '/home/deepDataBase/000060same/test/'
         self.shuffle_file_path = '/home/deepDataBase/000060same/time/'
-        self.corr_file = '/home/xutao/generateData/corr_2007'
+        self.corr_file = '/home/xutao/generateData/corr_2015'
         self.file_prefix = "data_"
         self.shuffle_file_num = 1
 
@@ -71,7 +71,7 @@ class ParamConfig:
 
     def get_sql_by_code(self, codes, begin_date, end_date):
         code_sql = ",".join(codes)
-        sql = self.sql_prefix + code_sql + self.sql_postfix + ' where date between {} and {}'.format(begin_date, end_date)
+        sql = self.sql_prefix + code_sql + self.sql_postfix + ' and date between {} and {}'.format(begin_date, end_date)
         return sql
 
 ## initialize a param config					

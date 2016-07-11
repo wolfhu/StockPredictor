@@ -43,7 +43,7 @@ def _decimal_scaling(df_data):
 
 
 def data_norm(df_data):
-    norm_strategy = config.strategy
+    norm_strategy = config.norm_strategy
     if norm_strategy == 'z-score':
         _z_score(df_data)
     elif norm_strategy == 'min-max':
